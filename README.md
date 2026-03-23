@@ -23,10 +23,11 @@ O projeto utiliza um pipeline de RAG para garantir que a IA tenha acesso aos dad
 ## 🛠️ Tecnologias Utilizadas
 
 - Linguagem: Python 3.10+
+- Package Manager: UV/NPM
 - Framework de IA: LangChain / LlamaIndex
 - Base de Dados Vetorial: ChromaDB
 - LLM: Google Gemini API (ou OpenAI GPT-4)
-- Frontend: Streamlit / Next.js (v0.dev)
+- Frontend: VueJS
 - Orquestração: FastAPI
 
 ## 📦 Como Instalar e Executar
@@ -41,13 +42,11 @@ cd semantic-log-explorer
 Configurar o ambiente virtual:
 
 ```
-python -m venv venv
-source venv/bin/activate  # No Windows: venv\Scripts\activate
-pip install -r requirements.txt
+uv sync
 ```
 
 Configurar Variáveis de Ambiente:
-Crie um ficheiro .env na raiz e adicione a sua chave de API:
+Crie um arquivo .env na pasta backend e adicione a sua chave de API:
 
 ```
 GOOGLE_API_KEY=sua_chave_aqui
@@ -57,7 +56,12 @@ DATABASE_URL=seu_link_db
 Executar a Aplicação:
 
 ```
-streamlit run app.py
+cd backend
+uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+cd frontend
+npm install
+npm run dev
 ```
 
 ## 💬 Exemplos de Uso
