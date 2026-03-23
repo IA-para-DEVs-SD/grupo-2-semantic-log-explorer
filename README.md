@@ -72,9 +72,9 @@ Uma vez que o sistema esteja a correr, pode fazer perguntas como:
 
 ## 👥 Equipe
 
-Josiel Eliseu Borges
-Luiz Antonio Roussenq
-Arthur Guerra Batista
-Barbara Haydée
-Caio rodrigo Oliveira
-Caio Batista dos Santos
+- Josiel Eliseu Borges
+- Luiz Antonio Roussenq
+- Arthur Guerra Batista
+- Barbara Haydée
+- Caio rodrigo Oliveira
+- Caio Batista dos Santos
