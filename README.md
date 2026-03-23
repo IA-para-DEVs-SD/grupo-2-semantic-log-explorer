@@ -76,5 +76,5 @@ Uma vez que o sistema esteja a correr, pode fazer perguntas como:
 - Luiz Antonio Roussenq
 - Arthur Guerra Batista
 - Barbara Haydée
-- Caio rodrigo Oliveira
+- Caio Rodrigo Oliveira
 - Caio Batista dos Santos
