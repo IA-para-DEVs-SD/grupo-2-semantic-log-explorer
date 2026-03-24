@@ -26,29 +26,29 @@ O projeto utiliza um pipeline de RAG para garantir que a IA tenha acesso aos dad
 
 ```mermaid
 graph TB
-    subgraph Frontend["🖥️ Frontend - VueJS"]
+    subgraph Frontend
         UI[Chat Interface]
         API_CLIENT[API Client]
     end
 
-    subgraph Backend["⚙️ Backend - FastAPI"]
+    subgraph Backend
         API[REST API]
-        INGEST[Módulo de Ingestão]
+        INGEST[Modulo de Ingestao]
         CHUNKER[Text Splitter]
         EMBEDDER[Embedding Generator]
         RETRIEVER[Retriever]
         LLM_SERVICE[LLM Service]
     end
 
-    subgraph Storage["🗄️ Armazenamento"]
-        CHROMADB[(ChromaDB - Vector Store)]
+    subgraph Storage
+        CHROMADB[(ChromaDB)]
     end
 
-    subgraph External["☁️ Serviços Externos"]
+    subgraph External
         GEMINI[Google Gemini API]
     end
 
-    UI -->|Pergunta em linguagem natural| API_CLIENT
+    UI -->|Pergunta| API_CLIENT
     API_CLIENT -->|HTTP Request| API
     API --> RETRIEVER
     RETRIEVER -->|Busca vetorial| CHROMADB
@@ -69,22 +69,22 @@ graph TB
 ```mermaid
 sequenceDiagram
     actor User as Utilizador
-    participant FE as Frontend (VueJS)
+    participant FE as Frontend
     participant API as FastAPI
     participant RET as Retriever
     participant DB as ChromaDB
     participant LLM as Gemini API
 
     User->>FE: Faz pergunta sobre logs
-    FE->>API: POST /chat {query}
+    FE->>API: POST /chat
     API->>RET: Processa query
-    RET->>DB: Busca vetorial (embeddings)
+    RET->>DB: Busca vetorial
     DB-->>RET: Top-K chunks relevantes
-    RET->>LLM: Prompt (contexto + pergunta)
+    RET->>LLM: Prompt com contexto
     LLM-->>RET: Resposta gerada
     RET-->>API: Resultado formatado
     API-->>FE: JSON Response
-    FE-->>User: Exibe diagnóstico
+    FE-->>User: Exibe diagnostico
 ```
 
 ### Diagrama de Sequência - Fluxo de Ingestão de Logs
@@ -93,20 +93,20 @@ sequenceDiagram
 sequenceDiagram
     actor Dev as Desenvolvedor
     participant API as FastAPI
-    participant ING as Módulo de Ingestão
+    participant ING as Ingestao
     participant SPL as Text Splitter
     participant EMB as Embedding Generator
     participant DB as ChromaDB
 
-    Dev->>API: POST /upload {arquivo de log}
+    Dev->>API: POST /upload arquivo de log
     API->>ING: Processa arquivo
     ING->>SPL: Divide em chunks
     SPL-->>ING: Chunks processados
     ING->>EMB: Gera embeddings
-    EMB-->>ING: Vetores numéricos
+    EMB-->>ING: Vetores numericos
     ING->>DB: Armazena vetores
-    DB-->>ING: Confirmação
-    ING-->>API: Status de ingestão
+    DB-->>ING: Confirmacao
+    ING-->>API: Status de ingestao
     API-->>Dev: Resposta de sucesso
 ```
 
