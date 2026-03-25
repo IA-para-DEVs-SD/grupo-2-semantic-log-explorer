@@ -20,6 +20,96 @@ O projeto utiliza um pipeline de RAG para garantir que a IA tenha acesso aos dad
 - Armazenamento: Os vetores são guardados numa base de dados vetorial (ChromaDB).
 - Recuperação & Resposta: Quando o utilizador faz uma pergunta, o sistema recupera os logs mais relevantes e envia-os como contexto para o LLM (Gemini 1.5 Pro / GPT-4) gerar a resposta.
 
+## � Diagrama UML
+
+### Diagrama de Componentes
+
+```mermaid
+graph TB
+    subgraph Frontend
+        UI[Chat Interface]
+        API_CLIENT[API Client]
+    end
+
+    subgraph Backend
+        API[REST API]
+        INGEST[Modulo de Ingestao]
+        CHUNKER[Text Splitter]
+        EMBEDDER[Embedding Generator]
+        RETRIEVER[Retriever]
+        LLM_SERVICE[LLM Service]
+    end
+
+    subgraph Storage
+        CHROMADB[(ChromaDB)]
+    end
+
+    subgraph External
+        GEMINI[Google Gemini API]
+    end
+
+    UI -->|Pergunta| API_CLIENT
+    API_CLIENT -->|HTTP Request| API
+    API --> RETRIEVER
+    RETRIEVER -->|Busca vetorial| CHROMADB
+    RETRIEVER -->|Contexto + Pergunta| LLM_SERVICE
+    LLM_SERVICE -->|Prompt| GEMINI
+    GEMINI -->|Resposta| LLM_SERVICE
+    LLM_SERVICE -->|Resposta formatada| API
+    API -->|HTTP Response| API_CLIENT
+    API_CLIENT -->|Exibe resposta| UI
+
+    INGEST -->|Logs brutos| CHUNKER
+    CHUNKER -->|Chunks| EMBEDDER
+    EMBEDDER -->|Vetores| CHROMADB
+```
+
+### Diagrama de Sequência - Fluxo de Consulta
+
+```mermaid
+sequenceDiagram
+    actor User as Utilizador
+    participant FE as Frontend
+    participant API as FastAPI
+    participant RET as Retriever
+    participant DB as ChromaDB
+    participant LLM as Gemini API
+
+    User->>FE: Faz pergunta sobre logs
+    FE->>API: POST /chat
+    API->>RET: Processa query
+    RET->>DB: Busca vetorial
+    DB-->>RET: Top-K chunks relevantes
+    RET->>LLM: Prompt com contexto
+    LLM-->>RET: Resposta gerada
+    RET-->>API: Resultado formatado
+    API-->>FE: JSON Response
+    FE-->>User: Exibe diagnostico
+```
+
+### Diagrama de Sequência - Fluxo de Ingestão de Logs
+
+```mermaid
+sequenceDiagram
+    actor Dev as Desenvolvedor
+    participant API as FastAPI
+    participant ING as Ingestao
+    participant SPL as Text Splitter
+    participant EMB as Embedding Generator
+    participant DB as ChromaDB
+
+    Dev->>API: POST /upload arquivo de log
+    API->>ING: Processa arquivo
+    ING->>SPL: Divide em chunks
+    SPL-->>ING: Chunks processados
+    ING->>EMB: Gera embeddings
+    EMB-->>ING: Vetores numericos
+    ING->>DB: Armazena vetores
+    DB-->>ING: Confirmacao
+    ING-->>API: Status de ingestao
+    API-->>Dev: Resposta de sucesso
+```
+
 ## 🛠️ Tecnologias Utilizadas
 
 - Linguagem: Python 3.10+
