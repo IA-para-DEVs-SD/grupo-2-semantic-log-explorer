@@ -1,0 +1,4 @@
+# file: /home/josiel/dev/work/python/grupo-2-semantic-log-explorer/backend/src/core/security.py
+# hypothesis_version: 6.148.7
+
+['[CPF_MASCARADO]', '[EMAIL_MASCARADO]', '[SENHA_MASCARADA]']

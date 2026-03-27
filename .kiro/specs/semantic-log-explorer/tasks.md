@@ -1,16 +1,16 @@
 # Tarefas de Implementação — Semantic Log Explorer
 
 ## 1. Configuração e Infraestrutura do Backend
-- [ ] 1.1 Criar `backend/src/models/schemas.py` com os modelos Pydantic (LogLevel, ChunkMetadata, Chunk, UploadResponse, ChatRequest, ErrorResponse)
-- [ ] 1.2 Criar `backend/src/core/config.py` com classe Settings (BaseSettings) carregando GOOGLE_API_KEY, CHROMA_COLLECTION_NAME, MAX_FILE_SIZE_MB, ALLOWED_EXTENSIONS do .env
-- [ ] 1.3 Criar `backend/src/api/dependencies.py` com providers de injeção de dependência para Settings, VectorStoreService e LLMService
-- [ ] 1.4 Atualizar `backend/.env.example` com todas as variáveis de ambiente necessárias (GOOGLE_API_KEY, CHROMA_COLLECTION_NAME)
-- [ ] 1.5 Atualizar `backend/src/main.py` para registrar rotas de upload e chat e configurar middleware de erro global
+- [x] 1.1 Criar `backend/src/models/schemas.py` com os modelos Pydantic (LogLevel, ChunkMetadata, Chunk, UploadResponse, ChatRequest, ErrorResponse)
+- [x] 1.2 Criar `backend/src/core/config.py` com classe Settings (BaseSettings) carregando GOOGLE_API_KEY, CHROMA_COLLECTION_NAME, MAX_FILE_SIZE_MB, ALLOWED_EXTENSIONS do .env
+- [x] 1.3 Criar `backend/src/api/dependencies.py` com providers de injeção de dependência para Settings, VectorStoreService e LLMService
+- [x] 1.4 Atualizar `backend/.env.example` com todas as variáveis de ambiente necessárias (GOOGLE_API_KEY, CHROMA_COLLECTION_NAME)
+- [x] 1.5 Atualizar `backend/src/main.py` para registrar rotas de upload e chat e configurar middleware de erro global
 
 ## 2. Sanitização de PII
-- [ ] 2.1 Criar `backend/src/core/security.py` com função `sanitize_pii(text: str) -> str` usando Regex para CPF, e-mail e senhas, substituindo por marcadores [CPF_MASCARADO], [EMAIL_MASCARADO], [SENHA_MASCARADA]
-- [ ] 2.2 Escrever testes unitários em `backend/tests/unit/test_security.py` para sanitização de PII com exemplos específicos e edge cases
-- [ ] 2.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_pii_sanitization_prop.py` — Feature: semantic-log-explorer, Property 5: Sanitização de PII remove todos os dados sensíveis
+- [x] 2.1 Criar `backend/src/core/security.py` com função `sanitize_pii(text: str) -> str` usando Regex para CPF, e-mail e senhas, substituindo por marcadores [CPF_MASCARADO], [EMAIL_MASCARADO], [SENHA_MASCARADA]
+- [x] 2.2 Escrever testes unitários em `backend/tests/unit/test_security.py` para sanitização de PII com exemplos específicos e edge cases
+- [x] 2.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_pii_sanitization_prop.py` — Feature: semantic-log-explorer, Property 5: Sanitização de PII remove todos os dados sensíveis
 
 ## 3. Ingestão e Chunking de Logs
 - [ ] 3.1 Criar `backend/src/services/ingestion.py` com função `process_file` que executa limpeza, sanitização PII e chunking semântico por evento/stack trace
