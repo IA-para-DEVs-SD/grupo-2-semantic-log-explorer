@@ -25,3 +25,9 @@ Atualize o conteudo da develop com a feature/issue-xxx
 5.
 
 Atualize o conteudo da main com a develop
+
+6. 
+
+Crie uma feature para a issue "Task 1 - Configuração e Infraestrutura do Backend" seguindo a regra dos steerings
+
+Não desenvolva nada por enquanto
