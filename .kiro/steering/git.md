@@ -6,6 +6,8 @@
 - Branch de desenvolvimento: `develop`
 - Branch de novas funcionalidades: `feature/issue-xxx` (na solicitação de criação de branch para a issue xxx)
 
+O processo de desenvolvimento deve seguir sempre a ortem de feature > develop > main
+
 ## Commit Semântico
 
 Formato:
