@@ -4,7 +4,7 @@
 
 - Branch principal: `main`
 - Branch de desenvolvimento: `develop`
-- Branch de novas funcionalidades: `feature/issue-xxx`
+- Branch de novas funcionalidades: `feature/issue-xxx` (na solicitação de criação de branch para a issue xxx)
 
 ## Commit Semântico
 
