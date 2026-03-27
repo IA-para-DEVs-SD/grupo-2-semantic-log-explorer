@@ -1,0 +1,19 @@
+# Prompts usados na interação com o Kiro com o projeto no Github
+
+1.
+
+Seguindo o arquivo de tasks da spec semantic-log-explorer
+
+me liste todas as tasks 
+
+2.
+
+para cada uma das 12 tasks (parent apenas) quero que você crie uma issue no board
+
+o titulo da task tem que ter o numero e nome da task
+
+E na descrição, tem que ter alem da task e subtasks, uma descrição textual do que deve ser feito
+
+3.
+
+Vincule as issues no board do projeto
