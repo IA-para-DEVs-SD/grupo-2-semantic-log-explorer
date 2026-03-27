@@ -28,6 +28,5 @@ Atualize o conteudo da main com a develop
 
 6. 
 
-Crie uma feature para a issue "Task 1 - Configuração e Infraestrutura do Backend" seguindo a regra dos steerings
+Commite todos arquivos e de o push
 
-Não desenvolva nada por enquanto

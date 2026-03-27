@@ -17,6 +17,15 @@ As branches criadas a partir de uma issue do board deve:
 - Atualizar o responsavel (Assignees) para a pessoa que solicitou a criação da feature
 - Deve trocar o status para "Em andamento"
 
+## Publicação da feature
+
+Ao ser solicitado pela publicação da feature, deve ser feito o seguinte:
+
+Commite todos arquivos 
+Publique a branch `feature/issue-xxx`
+Atualize a develop com a branch `feature/issue-xxx`
+Feche essa branch `feature/issue-xxx`
+
 ## Commit Semântico
 
 Formato:
