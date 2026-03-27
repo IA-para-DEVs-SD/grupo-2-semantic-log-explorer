@@ -8,6 +8,14 @@
 
 O processo de desenvolvimento deve seguir sempre a ortem de feature > develop > main
 
+## Criação de branch a partir de uma Issue
+
+As branches criadas a partir de uma issue do board deve:
+
+- Ter o nome no formato `feature/issue-xxx`
+- Atualizar o responsavel (Assignees) para a pessoa que solicitou a criação da feature
+- Deve trocar o status para "Em andamento"
+
 ## Commit Semântico
 
 Formato:
