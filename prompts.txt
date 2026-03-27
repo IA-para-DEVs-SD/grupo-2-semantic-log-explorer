@@ -17,3 +17,11 @@ E na descrição, tem que ter alem da task e subtasks, uma descrição textual d
 3.
 
 Vincule as issues no board do projeto
+
+4.
+
+Atualize o conteudo da develop com a feature/issue-xxx
+
+5.
+
+Atualize o conteudo da main com a develop
