@@ -28,5 +28,14 @@ Atualize o conteudo da main com a develop
 
 6. 
 
-Commite todos arquivos e de o push
+Crie uma feature para a issue "Task 1 - Configuração e Infraestrutura do Backend" seguindo a regra do steering git.md
 
+Não desenvolva nada por enquanto
+
+7.
+
+Execute a task "2. Sanitização de PII" da spec semantic-log-explorer
+
+8.
+
+Publique a branch seguindo o steering git.md
