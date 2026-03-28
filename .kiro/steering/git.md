@@ -45,3 +45,10 @@ Tipos permitidos:
 - `fix`: Correções
 - `refactor`: Refatorações
 - `tests`: Testes unitários, etc
+
+## Pull Request
+
+- Todo PR deve seguir o template definido em `.github/PULL_REQUEST_TEMPLATE.md`
+- O corpo do PR deve preencher todas as seções do template: Descrição, Issue Relacionada, Tipo de Mudança, O que foi feito, Testes e Checklist
+- Sempre vincular a issue relacionada usando `Closes #XX` para que a issue seja fechada automaticamente ao mergear
+- O título do PR deve seguir o formato de commit semântico: `tipo: breve descrição`
