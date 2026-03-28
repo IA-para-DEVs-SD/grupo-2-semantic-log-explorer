@@ -18,10 +18,10 @@
 - [x] 3.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_chunking_prop.py` — Feature: semantic-log-explorer, Property 2: Chunking preserva stack traces completos
 
 ## 4. VectorStore — Interface ChromaDB
-- [ ] 4.1 Criar `backend/src/services/vectorstore.py` com classe VectorStoreService (ChromaDB efêmero, embeddings via text-embedding-004, métodos add_chunks, search, clear_collection)
-- [ ] 4.2 Escrever testes unitários em `backend/tests/unit/test_vectorstore.py` para operações do ChromaDB (modo efêmero, limpeza de coleção)
-- [ ] 4.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_vectorization_prop.py` — Feature: semantic-log-explorer, Property 4: Vetorização produz embeddings e metadados corretos
-- [ ] 4.4 [PBT] Escrever teste de propriedade em `backend/tests/property/test_session_cleanup_prop.py` — Feature: semantic-log-explorer, Property 8: Limpeza de sessão remove todos os dados
+- [x] 4.1 Criar `backend/src/services/vectorstore.py` com classe VectorStoreService (ChromaDB efêmero, embeddings via text-embedding-004, métodos add_chunks, search, clear_collection)
+- [x] 4.2 Escrever testes unitários em `backend/tests/unit/test_vectorstore.py` para operações do ChromaDB (modo efêmero, limpeza de coleção)
+- [x] 4.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_vectorization_prop.py` — Feature: semantic-log-explorer, Property 4: Vetorização produz embeddings e metadados corretos
+- [x] 4.4 [PBT] Escrever teste de propriedade em `backend/tests/property/test_session_cleanup_prop.py` — Feature: semantic-log-explorer, Property 8: Limpeza de sessão remove todos os dados
 
 ## 5. Retriever — Busca Semântica
 - [ ] 5.1 Criar `backend/src/services/retriever.py` com função `retrieve(question, top_k)` que converte pergunta em vetor e busca chunks por similaridade de cosseno
