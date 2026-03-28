@@ -13,9 +13,9 @@
 - [x] 2.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_pii_sanitization_prop.py` — Feature: semantic-log-explorer, Property 5: Sanitização de PII remove todos os dados sensíveis
 
 ## 3. Ingestão e Chunking de Logs
-- [ ] 3.1 Criar `backend/src/services/ingestion.py` com função `process_file` que executa limpeza, sanitização PII e chunking semântico por evento/stack trace
-- [ ] 3.2 Escrever testes unitários em `backend/tests/unit/test_ingestion.py` para processamento de arquivos .log, .txt e .json
-- [ ] 3.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_chunking_prop.py` — Feature: semantic-log-explorer, Property 2: Chunking preserva stack traces completos
+- [x] 3.1 Criar `backend/src/services/ingestion.py` com função `process_file` que executa limpeza, sanitização PII e chunking semântico por evento/stack trace
+- [x] 3.2 Escrever testes unitários em `backend/tests/unit/test_ingestion.py` para processamento de arquivos .log, .txt e .json
+- [x] 3.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_chunking_prop.py` — Feature: semantic-log-explorer, Property 2: Chunking preserva stack traces completos
 
 ## 4. VectorStore — Interface ChromaDB
 - [ ] 4.1 Criar `backend/src/services/vectorstore.py` com classe VectorStoreService (ChromaDB efêmero, embeddings via text-embedding-004, métodos add_chunks, search, clear_collection)
