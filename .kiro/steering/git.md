@@ -21,12 +21,15 @@ As branches criadas a partir de uma issue do board deve:
 
 Ao ser solicitado pela publicação da feature, e essa for uma cujo formato é `feature/issue-xxx`, deve ser feito o seguinte:
 
-Commite todos arquivos 
-Publique a branch `feature/issue-xxx`
-Atualize a develop com a branch `feature/issue-xxx`
-Feche essa branch `feature/issue-xxx`
-Crie um pull request da develop para main
-Atualize o status no Board para "Concluído"
+1. Commite todos arquivos na branch `feature/issue-xxx`
+2. Publique (push) a branch `feature/issue-xxx` no remote
+3. Crie um pull request de `feature/issue-xxx` → `develop`
+
+**Nota**: Os PRs devem ser de `feature/issue-xxx` → `develop` (e não de `develop` → `main`) porque o GitHub não permite ter dois PRs abertos com o mesmo par de branches. Se duas tasks criassem PRs de `develop` → `main` ao mesmo tempo, o segundo PR não poderia ser criado.
+
+## Release (develop → main)
+
+- O merge de `develop` → `main` é feito pelo líder do grupo via PR de release
 
 ## Commit Semântico
 
