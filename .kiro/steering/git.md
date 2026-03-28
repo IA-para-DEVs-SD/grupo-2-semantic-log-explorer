@@ -25,6 +25,7 @@ Commite todos arquivos
 Publique a branch `feature/issue-xxx`
 Atualize a develop com a branch `feature/issue-xxx`
 Feche essa branch `feature/issue-xxx`
+Crie um pull request da develop para main
 Atualize o status no Board para "Concluído"
 
 ## Commit Semântico
