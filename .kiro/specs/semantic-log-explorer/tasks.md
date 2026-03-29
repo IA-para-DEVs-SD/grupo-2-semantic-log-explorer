@@ -42,9 +42,9 @@
 - [x] 7.6 [PBT] Escrever teste de propriedade em `backend/tests/property/test_sse_format_prop.py` — Feature: semantic-log-explorer, Property 9: Resposta de chat utiliza formato SSE
 
 ## 8. Configuração do Frontend
-- [ ] 8.1 Inicializar projeto VueJS 3 em `frontend/` com Vite, Composition API e dependências (markdown-it ou marked para renderização Markdown)
-- [ ] 8.2 Criar `frontend/src/assets/styles.css` com estilos minimalistas (estilo Shadcn UI)
-- [ ] 8.3 Configurar `frontend/src/main.js` e `frontend/src/App.vue` com layout principal
+- [x] 8.1 Inicializar projeto VueJS 3 em `frontend/` com Vite, Composition API e dependências (markdown-it ou marked para renderização Markdown)
+- [x] 8.2 Criar `frontend/src/assets/styles.css` com estilos minimalistas (estilo Shadcn UI)
+- [x] 8.3 Configurar `frontend/src/main.js` e `frontend/src/App.vue` com layout principal
 
 ## 9. Componentes do Frontend
 - [ ] 9.1 Criar `frontend/src/components/FileUpload.vue` com upload drag-and-drop, validação de formato (.log, .txt, .json), exibição de progresso e confirmação/erro
