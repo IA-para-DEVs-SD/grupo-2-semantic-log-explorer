@@ -5,6 +5,7 @@
  */
 
 import { ref } from 'vue'
+import FileUpload from './components/FileUpload.vue'
 
 // State for uploaded file info
 const uploadedFile = ref(null)
@@ -35,13 +36,10 @@ const handleUploadError = (error) => {
 
     <main class="app-main">
       <section class="upload-section">
-        <div class="upload-placeholder">
-          <!-- FileUpload component will be added here -->
-          <p class="placeholder-text">Upload de arquivos (.log, .txt, .json)</p>
-          <p v-if="uploadedFile" class="upload-info">
-            Arquivo: {{ uploadedFile.filename }} | Chunks: {{ uploadedFile.chunks }}
-          </p>
-        </div>
+        <FileUpload
+          @upload-success="handleUploadSuccess"
+          @upload-error="handleUploadError"
+        />
       </section>
 
       <section class="chat-section">
