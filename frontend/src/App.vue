@@ -6,6 +6,7 @@
 
 import { ref } from 'vue'
 import FileUpload from './components/FileUpload.vue'
+import ChatWindow from './components/ChatWindow.vue'
 
 // State for uploaded file info
 const uploadedFile = ref(null)
@@ -43,10 +44,7 @@ const handleUploadError = (error) => {
       </section>
 
       <section class="chat-section">
-        <div class="chat-placeholder">
-          <!-- ChatWindow component will be added here -->
-          <p class="placeholder-text">Interface de chat</p>
-        </div>
+        <ChatWindow />
       </section>
     </main>
 
@@ -101,32 +99,7 @@ const handleUploadError = (error) => {
   min-height: 400px;
 }
 
-.upload-placeholder,
-.chat-placeholder {
-  border: 2px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 2rem;
-  text-align: center;
-  background: var(--muted);
-}
 
-.chat-placeholder {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.placeholder-text {
-  color: var(--muted-foreground);
-  margin: 0;
-}
-
-.upload-info {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--foreground);
-}
 
 .app-footer {
   padding: 1rem 2rem;
