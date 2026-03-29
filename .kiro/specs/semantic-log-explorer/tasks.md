@@ -24,14 +24,14 @@
 - [x] 4.4 [PBT] Escrever teste de propriedade em `backend/tests/property/test_session_cleanup_prop.py` — Feature: semantic-log-explorer, Property 8: Limpeza de sessão remove todos os dados
 
 ## 5. Retriever — Busca Semântica
-- [ ] 5.1 Criar `backend/src/services/retriever.py` com função `retrieve(question, top_k)` que converte pergunta em vetor e busca chunks por similaridade de cosseno
-- [ ] 5.2 Escrever testes unitários em `backend/tests/unit/test_retriever.py` para busca semântica
-- [ ] 5.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_retriever_prop.py` — Feature: semantic-log-explorer, Property 6: Retriever retorna quantidade limitada de resultados
+- [x] 5.1 Criar `backend/src/services/retriever.py` com função `retrieve(question, top_k)` que converte pergunta em vetor e busca chunks por similaridade de cosseno
+- [x] 5.2 Escrever testes unitários em `backend/tests/unit/test_retriever.py` para busca semântica
+- [x] 5.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_retriever_prop.py` — Feature: semantic-log-explorer, Property 6: Retriever retorna quantidade limitada de resultados
 
 ## 6. Serviço LLM — Integração Gemini
-- [ ] 6.1 Criar `backend/src/services/llm.py` com classe LLMService (prompt de sistema SRE Senior, método generate_stream com streaming assíncrono via Gemini)
-- [ ] 6.2 Escrever testes unitários em `backend/tests/unit/test_llm.py` para montagem de prompt e instrução contra especulação
-- [ ] 6.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_prompt_assembly_prop.py` — Feature: semantic-log-explorer, Property 7: Montagem do prompt inclui papel e contexto
+- [x] 6.1 Criar `backend/src/services/llm.py` com classe LLMService (prompt de sistema SRE Senior, método generate_stream com streaming assíncrono via Gemini)
+- [x] 6.2 Escrever testes unitários em `backend/tests/unit/test_llm.py` para montagem de prompt e instrução contra especulação
+- [x] 6.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_prompt_assembly_prop.py` — Feature: semantic-log-explorer, Property 7: Montagem do prompt inclui papel e contexto
 
 ## 7. Rotas da API (Upload e Chat)
 - [ ] 7.1 Criar `backend/src/api/routes/upload.py` com POST /api/upload (validação de formato e tamanho, orquestração do pipeline de ingestão)
