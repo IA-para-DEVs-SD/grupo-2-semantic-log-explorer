@@ -47,10 +47,10 @@
 - [x] 8.3 Configurar `frontend/src/main.js` e `frontend/src/App.vue` com layout principal
 
 ## 9. Componentes do Frontend
-- [ ] 9.1 Criar `frontend/src/components/FileUpload.vue` com upload drag-and-drop, validação de formato (.log, .txt, .json), exibição de progresso e confirmação/erro
-- [ ] 9.2 Criar `frontend/src/components/ChatWindow.vue` com área de conversa, scroll automático, campo de entrada e estado de loading
-- [ ] 9.3 Criar `frontend/src/components/MessageBubble.vue` com renderização de mensagens (usuário/IA), suporte a Markdown e blocos de código formatados
-- [ ] 9.4 Criar `frontend/src/composables/useChat.js` com lógica de comunicação API, consumo de SSE, gerenciamento de estado (mensagens, loading, erro)
+- [x] 9.1 Criar `frontend/src/components/FileUpload.vue` com upload drag-and-drop, validação de formato (.log, .txt, .json), exibição de progresso e confirmação/erro
+- [x] 9.2 Criar `frontend/src/components/ChatWindow.vue` com área de conversa, scroll automático, campo de entrada e estado de loading
+- [x] 9.3 Criar `frontend/src/components/MessageBubble.vue` com renderização de mensagens (usuário/IA), suporte a Markdown e blocos de código formatados
+- [x] 9.4 Criar `frontend/src/composables/useChat.js` com lógica de comunicação API, consumo de SSE, gerenciamento de estado (mensagens, loading, erro)
 
 ## 10. Testes do Frontend
 - [ ] 10.1 Escrever testes unitários em `frontend/tests/unit/FileUpload.test.js` para componente de upload
