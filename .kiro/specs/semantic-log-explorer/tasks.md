@@ -34,12 +34,12 @@
 - [x] 6.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_prompt_assembly_prop.py` — Feature: semantic-log-explorer, Property 7: Montagem do prompt inclui papel e contexto
 
 ## 7. Rotas da API (Upload e Chat)
-- [ ] 7.1 Criar `backend/src/api/routes/upload.py` com POST /api/upload (validação de formato e tamanho, orquestração do pipeline de ingestão)
-- [ ] 7.2 Criar `backend/src/api/routes/chat.py` com POST /api/chat (orquestração retriever → LLM → StreamingResponse SSE)
-- [ ] 7.3 Escrever testes unitários em `backend/tests/unit/test_routes.py` para rotas de upload e chat (validações, edge cases, erros)
-- [ ] 7.4 [PBT] Escrever teste de propriedade em `backend/tests/property/test_file_validation_prop.py` — Feature: semantic-log-explorer, Property 1: Validação de formato de arquivo
-- [ ] 7.5 [PBT] Escrever teste de propriedade em `backend/tests/property/test_upload_response_prop.py` — Feature: semantic-log-explorer, Property 3: Resposta de upload contém campos obrigatórios
-- [ ] 7.6 [PBT] Escrever teste de propriedade em `backend/tests/property/test_sse_format_prop.py` — Feature: semantic-log-explorer, Property 9: Resposta de chat utiliza formato SSE
+- [x] 7.1 Criar `backend/src/api/routes/upload.py` com POST /api/upload (validação de formato e tamanho, orquestração do pipeline de ingestão)
+- [x] 7.2 Criar `backend/src/api/routes/chat.py` com POST /api/chat (orquestração retriever → LLM → StreamingResponse SSE)
+- [x] 7.3 Escrever testes unitários em `backend/tests/unit/test_routes.py` para rotas de upload e chat (validações, edge cases, erros)
+- [x] 7.4 [PBT] Escrever teste de propriedade em `backend/tests/property/test_file_validation_prop.py` — Feature: semantic-log-explorer, Property 1: Validação de formato de arquivo
+- [x] 7.5 [PBT] Escrever teste de propriedade em `backend/tests/property/test_upload_response_prop.py` — Feature: semantic-log-explorer, Property 3: Resposta de upload contém campos obrigatórios
+- [x] 7.6 [PBT] Escrever teste de propriedade em `backend/tests/property/test_sse_format_prop.py` — Feature: semantic-log-explorer, Property 9: Resposta de chat utiliza formato SSE
 
 ## 8. Configuração do Frontend
 - [ ] 8.1 Inicializar projeto VueJS 3 em `frontend/` com Vite, Composition API e dependências (markdown-it ou marked para renderização Markdown)
