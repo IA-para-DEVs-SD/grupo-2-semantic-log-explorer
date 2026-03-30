@@ -39,3 +39,8 @@ Execute a task "2. Sanitização de PII" da spec semantic-log-explorer
 8.
 
 Publique a branch seguindo o steering git.md
+
+
+9. 
+
+Crie uma feature apartir da develop e comite os arquivos e de o push e depois um pull request para develop
