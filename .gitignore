@@ -26,4 +26,6 @@ chroma_data/
 # Logs
 *.log
 
+# Testing
 .hypothesis/
+htmlcov/
