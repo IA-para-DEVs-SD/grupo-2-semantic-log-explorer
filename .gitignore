@@ -29,3 +29,5 @@ chroma_data/
 # Testing
 .hypothesis/
 htmlcov/
+
+.coverage
