@@ -59,8 +59,8 @@
 - [ ] 10.4 Escrever testes unitários em `frontend/tests/unit/useChat.test.js` para composable de comunicação API
 
 ## 11. Configuração de Testes do Backend
-- [ ] 11.1 Criar `backend/tests/conftest.py` com fixtures compartilhadas (test client async, ChromaDB efêmero de teste, mocks de API externa)
-- [ ] 11.2 Escrever testes unitários em `backend/tests/unit/test_config.py` para carregamento de configurações e falha sem GOOGLE_API_KEY
+- [x] 11.1 Criar `backend/tests/conftest.py` com fixtures compartilhadas (test client async, ChromaDB efêmero de teste, mocks de API externa)
+- [x] 11.2 Escrever testes unitários em `backend/tests/unit/test_config.py` para carregamento de configurações e falha sem GOOGLE_API_KEY
 
 ## 12. Docker e Integração
 - [ ] 12.1 Atualizar `Dockerfile` se necessário para incluir dependências de teste e configuração de produção
