@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Ruff Lint & Format on Save",
+  "description": "Executa ruff check e ruff format automaticamente ao salvar arquivos Python",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.py"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "ruff check --fix ${file} && ruff format ${file}"
+  }
+}
