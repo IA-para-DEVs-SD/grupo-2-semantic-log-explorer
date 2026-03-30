@@ -59,6 +59,7 @@ _token_count_strategy = st.integers(min_value=1, max_value=10)
 # Fixtures (inline for property tests)
 # ---------------------------------------------------------------------------
 
+
 def create_test_app(mock_vectorstore, mock_llm_service):
     """Create FastAPI app with mocked dependencies for testing."""
     from backend.src.api.dependencies import (
@@ -108,6 +109,7 @@ def create_mock_llm_service(tokens: list[str]):
 # Property test
 # ---------------------------------------------------------------------------
 
+
 @settings(max_examples=100)
 @given(
     question=_question_strategy,
@@ -118,7 +120,7 @@ def test_chat_response_uses_sse_format(
     tokens: list[str],
 ) -> None:
     """Property 9: Chat response uses SSE format.
-    
+
     For any response from POST /api/chat:
     - Content-Type must be `text/event-stream`
     - Data must follow SSE format (prefix `data:` in each event)
@@ -165,8 +167,10 @@ def test_chat_response_uses_sse_format(
 
         # Verify each non-empty line that is an event has the data: prefix
         lines = content.split("\n")
-        data_lines = [line for line in lines if line.strip() and not line.startswith(":")]
-        
+        data_lines = [
+            line for line in lines if line.strip() and not line.startswith(":")
+        ]
+
         for line in data_lines:
             assert line.startswith("data:"), (
                 f"Expected SSE event line to start with 'data:', got: {line!r}"

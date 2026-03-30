@@ -20,6 +20,7 @@ from backend.src.models.schemas import Chunk, LogLevel
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_upload(content: str, filename: str = "app.log") -> UploadFile:
     """Create a fake UploadFile from a string."""
     return UploadFile(
@@ -31,6 +32,7 @@ def _make_upload(content: str, filename: str = "app.log") -> UploadFile:
 # ---------------------------------------------------------------------------
 # _clean_noise
 # ---------------------------------------------------------------------------
+
 
 class TestCleanNoise:
     def test_replaces_uuid(self):
@@ -54,6 +56,7 @@ class TestCleanNoise:
 # _detect_log_level / _extract_timestamp
 # ---------------------------------------------------------------------------
 
+
 class TestDetectLogLevel:
     def test_detects_error(self):
         assert _detect_log_level("2024-01-01 ERROR something") == LogLevel.ERROR
@@ -70,10 +73,14 @@ class TestDetectLogLevel:
 
 class TestExtractTimestamp:
     def test_extracts_iso_timestamp(self):
-        assert _extract_timestamp("2024-01-15T10:30:00 INFO ok") == "2024-01-15T10:30:00"
+        assert (
+            _extract_timestamp("2024-01-15T10:30:00 INFO ok") == "2024-01-15T10:30:00"
+        )
 
     def test_extracts_space_separated(self):
-        assert _extract_timestamp("2024-01-15 10:30:00 INFO ok") == "2024-01-15 10:30:00"
+        assert (
+            _extract_timestamp("2024-01-15 10:30:00 INFO ok") == "2024-01-15 10:30:00"
+        )
 
     def test_returns_none_when_absent(self):
         assert _extract_timestamp("no timestamp here") is None
@@ -82,6 +89,7 @@ class TestExtractTimestamp:
 # ---------------------------------------------------------------------------
 # _is_stack_trace_line
 # ---------------------------------------------------------------------------
+
 
 class TestIsStackTraceLine:
     def test_traceback_header(self):
@@ -104,6 +112,7 @@ class TestIsStackTraceLine:
 # ---------------------------------------------------------------------------
 # process_file — .log / .txt
 # ---------------------------------------------------------------------------
+
 
 class TestProcessFileLog:
     @pytest.mark.asyncio
@@ -169,7 +178,9 @@ class TestProcessFileLog:
 
     @pytest.mark.asyncio
     async def test_pii_is_sanitized(self):
-        content = "2024-01-15 10:00:00 INFO User 123.456.789-00 logged in from admin@corp.com"
+        content = (
+            "2024-01-15 10:00:00 INFO User 123.456.789-00 logged in from admin@corp.com"
+        )
         upload = _make_upload(content, "app.log")
         result = await process_file(upload)
         assert len(result) >= 1
@@ -215,6 +226,7 @@ class TestProcessFileLog:
 # process_file — .json
 # ---------------------------------------------------------------------------
 
+
 class TestProcessFileJson:
     @pytest.mark.asyncio
     async def test_json_array(self):
@@ -230,7 +242,11 @@ class TestProcessFileJson:
 
     @pytest.mark.asyncio
     async def test_json_single_object(self):
-        data = {"timestamp": "2024-01-15T10:00:00", "level": "WARNING", "message": "slow"}
+        data = {
+            "timestamp": "2024-01-15T10:00:00",
+            "level": "WARNING",
+            "message": "slow",
+        }
         upload = _make_upload(json.dumps(data), "entry.json")
         result = await process_file(upload)
         assert len(result) == 1
@@ -239,8 +255,12 @@ class TestProcessFileJson:
     @pytest.mark.asyncio
     async def test_jsonl_format(self):
         lines = [
-            json.dumps({"timestamp": "2024-01-15T10:00:00", "level": "INFO", "message": "a"}),
-            json.dumps({"timestamp": "2024-01-15T10:00:01", "level": "DEBUG", "message": "b"}),
+            json.dumps(
+                {"timestamp": "2024-01-15T10:00:00", "level": "INFO", "message": "a"}
+            ),
+            json.dumps(
+                {"timestamp": "2024-01-15T10:00:01", "level": "DEBUG", "message": "b"}
+            ),
         ]
         upload = _make_upload("\n".join(lines), "logs.json")
         result = await process_file(upload)

@@ -56,6 +56,7 @@ _file_content_strategy = st.binary(min_size=1, max_size=1024)
 # Fixtures (inline for property tests)
 # ---------------------------------------------------------------------------
 
+
 def create_test_app():
     """Create FastAPI app with mocked dependencies for testing."""
     from backend.src.api.dependencies import (
@@ -86,6 +87,7 @@ def create_test_app():
 # Property test
 # ---------------------------------------------------------------------------
 
+
 @settings(max_examples=100)
 @given(
     filename_base=_filename_base_strategy,
@@ -112,7 +114,9 @@ def test_valid_extensions_are_accepted(
             ),
         ]
 
-        files = {"file": (filename, io.BytesIO(file_content), "application/octet-stream")}
+        files = {
+            "file": (filename, io.BytesIO(file_content), "application/octet-stream")
+        }
         response = client.post("/api/upload", files=files)
 
         assert response.status_code == 200, (

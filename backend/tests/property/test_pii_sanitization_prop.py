@@ -29,7 +29,9 @@ _email_strategy = st.builds(
     lambda u, d, t: f"{u}@{d}.{t}", _email_user, _email_domain, _email_tld
 )
 
-_password_key = st.sampled_from(["password", "passwd", "pwd", "senha", "secret", "token"])
+_password_key = st.sampled_from(
+    ["password", "passwd", "pwd", "senha", "secret", "token"]
+)
 _password_sep = st.sampled_from(["=", ": ", "="])
 _password_val = st.from_regex(r"[A-Za-z0-9_!@#$%]{3,20}", fullmatch=True)
 _password_strategy = st.builds(
@@ -42,6 +44,7 @@ _filler = st.from_regex(r"[A-Za-z0-9 ]{0,30}", fullmatch=True)
 # ---------------------------------------------------------------------------
 # Property test
 # ---------------------------------------------------------------------------
+
 
 @settings(max_examples=200)
 @given(

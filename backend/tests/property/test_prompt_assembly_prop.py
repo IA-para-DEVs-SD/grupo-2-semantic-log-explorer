@@ -75,6 +75,7 @@ _chunks_strategy = st.lists(_chunk_strategy, min_size=1, max_size=10)
 # Property test
 # ---------------------------------------------------------------------------
 
+
 @settings(max_examples=100)
 @given(
     chunks=_chunks_strategy,
@@ -104,9 +105,7 @@ def test_prompt_includes_role_and_all_chunk_context(
     prompt = build_prompt(question, chunks)
 
     # The prompt must contain the user's question
-    assert question in prompt, (
-        f"Prompt must contain the user question: {question!r}"
-    )
+    assert question in prompt, f"Prompt must contain the user question: {question!r}"
 
     # The prompt must contain the text of every chunk
     for i, chunk in enumerate(chunks):

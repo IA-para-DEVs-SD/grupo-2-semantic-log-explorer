@@ -30,7 +30,9 @@ def dockerfile_stages(dockerfile_content: str) -> list[dict]:
 
     for line in dockerfile_content.splitlines():
         stripped = line.strip()
-        from_match = re.match(r"^FROM\s+(\S+)(?:\s+AS\s+(\S+))?", stripped, re.IGNORECASE)
+        from_match = re.match(
+            r"^FROM\s+(\S+)(?:\s+AS\s+(\S+))?", stripped, re.IGNORECASE
+        )
         if from_match:
             current_stage = {
                 "image": from_match.group(1),
@@ -100,9 +102,7 @@ class TestProductionStage:
     def test_expose_80(self, dockerfile_stages):
         prod = dockerfile_stages[1]
         expose_lines = [l for l in prod["lines"] if l.startswith("EXPOSE")]
-        assert any("80" in l for l in expose_lines), (
-            "Production stage must EXPOSE 80"
-        )
+        assert any("80" in l for l in expose_lines), "Production stage must EXPOSE 80"
 
     def test_copies_assets_from_build_stage(self, dockerfile_stages):
         prod = dockerfile_stages[1]

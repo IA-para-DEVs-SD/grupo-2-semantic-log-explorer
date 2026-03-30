@@ -43,6 +43,7 @@ def _make_chunk(
 # System prompt content
 # ---------------------------------------------------------------------------
 
+
 class TestSystemPrompt:
     def test_contains_sre_senior_role(self):
         """Prompt must instruct Gemini to act as SRE Senior."""
@@ -70,6 +71,7 @@ class TestSystemPrompt:
 # ---------------------------------------------------------------------------
 # build_prompt
 # ---------------------------------------------------------------------------
+
 
 class TestBuildPrompt:
     def test_includes_question(self):
@@ -123,6 +125,7 @@ class TestBuildPrompt:
 # LLMService initialization
 # ---------------------------------------------------------------------------
 
+
 class TestLLMServiceInit:
     def test_creates_model_with_system_prompt(self):
         with patch("backend.src.services.llm.genai") as mock_genai:
@@ -137,6 +140,7 @@ class TestLLMServiceInit:
 # ---------------------------------------------------------------------------
 # generate_stream
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateStream:
     @pytest.mark.asyncio
@@ -169,7 +173,11 @@ class TestGenerateStream:
 
         with patch("backend.src.services.llm.genai") as mock_genai:
             mock_model = MagicMock()
-            mock_model.generate_content.return_value = [mock_chunk1, mock_chunk2, mock_chunk3]
+            mock_model.generate_content.return_value = [
+                mock_chunk1,
+                mock_chunk2,
+                mock_chunk3,
+            ]
             mock_genai.GenerativeModel.return_value = mock_model
 
             svc = LLMService(_fake_settings())

@@ -50,6 +50,7 @@ _chunk_count_strategy = st.integers(min_value=1, max_value=100)
 # Fixtures (inline for property tests)
 # ---------------------------------------------------------------------------
 
+
 def create_test_app():
     """Create FastAPI app with mocked dependencies for testing."""
     from backend.src.api.dependencies import (
@@ -76,6 +77,7 @@ def create_test_app():
 # Property test
 # ---------------------------------------------------------------------------
 
+
 @settings(max_examples=100)
 @given(
     filename_base=_filename_base_strategy,
@@ -90,7 +92,7 @@ def test_upload_response_contains_required_fields(
     chunk_count: int,
 ) -> None:
     """Property 3: Upload response contains required fields.
-    
+
     For any valid file processed successfully:
     - `status` must equal "indexed"
     - `chunks` must be an integer >= 1
@@ -122,7 +124,9 @@ def test_upload_response_contains_required_fields(
     with patch("backend.src.api.routes.upload.process_file") as mock_process_file:
         mock_process_file.return_value = mock_chunks
 
-        files = {"file": (filename, io.BytesIO(file_content), "application/octet-stream")}
+        files = {
+            "file": (filename, io.BytesIO(file_content), "application/octet-stream")
+        }
         response = client.post("/api/upload", files=files)
 
         # Verify HTTP 200 success
@@ -143,9 +147,7 @@ def test_upload_response_contains_required_fields(
         assert isinstance(data["chunks"], int), (
             f"Expected 'chunks' to be an integer, got {type(data['chunks']).__name__}"
         )
-        assert data["chunks"] >= 1, (
-            f"Expected chunks >= 1, got chunks={data['chunks']}"
-        )
+        assert data["chunks"] >= 1, f"Expected chunks >= 1, got chunks={data['chunks']}"
         assert data["chunks"] == chunk_count, (
             f"Expected chunks={chunk_count}, got chunks={data['chunks']}"
         )
