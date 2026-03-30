@@ -72,8 +72,26 @@ npm run dev
 
 ### Execução com Docker
 
+1. Crie o arquivo de variáveis de ambiente a partir do template:
+
 ```bash
-docker-compose up --build
+cp backend/.env.example backend/.env
+```
+
+Edite `backend/.env` e preencha a variável obrigatória `GOOGLE_API_KEY`. As demais variáveis possuem valores padrão.
+
+2. Execute com o perfil desejado:
+
+**Produção** (imagens otimizadas com Nginx):
+
+```bash
+docker compose --profile prod up --build
+```
+
+**Desenvolvimento** (hot-reload com volumes montados):
+
+```bash
+docker compose --profile dev up --build
 ```
 
 ## 👥 Integrantes do Grupo

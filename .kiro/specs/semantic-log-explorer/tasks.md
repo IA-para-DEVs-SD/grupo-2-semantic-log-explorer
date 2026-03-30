@@ -63,5 +63,5 @@
 - [x] 11.2 Escrever testes unitários em `backend/tests/unit/test_config.py` para carregamento de configurações e falha sem GOOGLE_API_KEY
 
 ## 12. Docker e Integração
-- [ ] 12.1 Atualizar `Dockerfile` se necessário para incluir dependências de teste e configuração de produção
-- [ ] 12.2 Atualizar `docker-compose.yml` se necessário para garantir orquestração correta dos serviços com variáveis de ambiente
+- [x] 12.1 Atualizar `Dockerfile` se necessário para incluir dependências de teste e configuração de produção
+- [x] 12.2 Atualizar `docker-compose.yml` se necessário para garantir orquestração correta dos serviços com variáveis de ambiente
