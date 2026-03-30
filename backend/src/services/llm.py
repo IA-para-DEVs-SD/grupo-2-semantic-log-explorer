@@ -55,7 +55,9 @@ def build_prompt(question: str, context_chunks: list[Chunk]) -> str:
         header += "]"
         context_parts.append(f"{header}\n{chunk.text}")
 
-    context_block = "\n\n".join(context_parts) if context_parts else "(Nenhum log disponível)"
+    context_block = (
+        "\n\n".join(context_parts) if context_parts else "(Nenhum log disponível)"
+    )
 
     return (
         f"## Contexto dos Logs\n\n{context_block}\n\n"

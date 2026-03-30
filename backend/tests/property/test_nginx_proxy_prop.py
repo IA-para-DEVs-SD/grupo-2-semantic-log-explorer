@@ -28,6 +28,7 @@ NGINX_CONF_PATH = PROJECT_ROOT / "frontend" / "nginx.conf"
 # Nginx config parser helpers
 # ---------------------------------------------------------------------------
 
+
 def _parse_location_blocks(nginx_content: str) -> list[tuple[str, str]]:
     """Extract (pattern, body) pairs from ``location`` blocks.
 
@@ -37,9 +38,7 @@ def _parse_location_blocks(nginx_content: str) -> list[tuple[str, str]]:
     """
     blocks: list[tuple[str, str]] = []
     # Match  location <pattern> { ... }
-    for m in re.finditer(
-        r"location\s+([^\{]+?)\s*\{", nginx_content
-    ):
+    for m in re.finditer(r"location\s+([^\{]+?)\s*\{", nginx_content):
         pattern = m.group(1).strip()
         start = m.end()
         depth = 1
@@ -114,6 +113,7 @@ _any_api_path = st.one_of(_api_path_strategy, _api_path_with_query)
 # Property tests
 # ---------------------------------------------------------------------------
 
+
 @settings(max_examples=100)
 @given(path=_any_api_path)
 def test_api_paths_routed_to_backend(path: str) -> None:
@@ -133,9 +133,7 @@ def test_api_paths_routed_to_backend(path: str) -> None:
     match_path = path.split("?")[0]
 
     matched = _find_matching_block(blocks, match_path)
-    assert matched is not None, (
-        f"No location block matches path {path!r}"
-    )
+    assert matched is not None, f"No location block matches path {path!r}"
 
     pattern, body = matched
     assert _block_has_proxy_pass_to_backend(body), (
@@ -165,9 +163,7 @@ def test_api_location_is_more_specific_than_root(path: str) -> None:
 
     # There must be an /api block
     api_blocks = [(p, b) for p, b in blocks if p.strip() == "/api"]
-    assert len(api_blocks) >= 1, (
-        "nginx.conf must contain a 'location /api' block"
-    )
+    assert len(api_blocks) >= 1, "nginx.conf must contain a 'location /api' block"
 
     # The /api block must be longer prefix than /
     match_path = path.split("?")[0]

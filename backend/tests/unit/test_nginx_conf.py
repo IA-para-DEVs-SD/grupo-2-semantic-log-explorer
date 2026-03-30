@@ -58,9 +58,9 @@ class TestNginxProxyHeaders:
     """Verify proxy headers are set in the /api location block."""
 
     def test_proxy_header_host(self, nginx_content: str):
-        assert re.search(
-            r"proxy_set_header\s+Host\s+\$host\s*;", nginx_content
-        ), "nginx.conf must set proxy header Host"
+        assert re.search(r"proxy_set_header\s+Host\s+\$host\s*;", nginx_content), (
+            "nginx.conf must set proxy header Host"
+        )
 
     def test_proxy_header_x_real_ip(self, nginx_content: str):
         assert re.search(

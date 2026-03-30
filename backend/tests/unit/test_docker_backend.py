@@ -30,7 +30,9 @@ def dockerfile_stages(dockerfile_content: str) -> list[dict]:
 
     for line in dockerfile_content.splitlines():
         stripped = line.strip()
-        from_match = re.match(r"^FROM\s+(\S+)(?:\s+AS\s+(\S+))?", stripped, re.IGNORECASE)
+        from_match = re.match(
+            r"^FROM\s+(\S+)(?:\s+AS\s+(\S+))?", stripped, re.IGNORECASE
+        )
         if from_match:
             current_stage = {
                 "image": from_match.group(1),

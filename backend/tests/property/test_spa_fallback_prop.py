@@ -26,15 +26,30 @@ NGINX_CONF_PATH = PROJECT_ROOT / "frontend" / "nginx.conf"
 
 # Common static-file extensions served directly by Nginx
 _STATIC_EXTENSIONS = {
-    ".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg",
-    ".ico", ".woff", ".woff2", ".ttf", ".eot", ".map", ".json",
-    ".webp", ".avif", ".html",
+    ".js",
+    ".css",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".svg",
+    ".ico",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+    ".map",
+    ".json",
+    ".webp",
+    ".avif",
+    ".html",
 }
 
 
 # ---------------------------------------------------------------------------
 # Nginx config parser helpers (shared logic with test_nginx_proxy_prop)
 # ---------------------------------------------------------------------------
+
 
 def _parse_location_blocks(nginx_content: str) -> list[tuple[str, str]]:
     """Extract (pattern, body) pairs from ``location`` blocks."""
@@ -118,6 +133,7 @@ _any_spa_route = st.one_of(
 # Property tests
 # ---------------------------------------------------------------------------
 
+
 @settings(max_examples=100)
 @given(path=_any_spa_route)
 def test_non_static_routes_fallback_to_index_html(path: str) -> None:
@@ -136,17 +152,17 @@ def test_non_static_routes_fallback_to_index_html(path: str) -> None:
 
     # Ensure the path has no static file extension
     last_segment = match_path.rsplit("/", 1)[-1]
-    assume("." not in last_segment or
-           not any(last_segment.endswith(ext) for ext in _STATIC_EXTENSIONS))
+    assume(
+        "." not in last_segment
+        or not any(last_segment.endswith(ext) for ext in _STATIC_EXTENSIONS)
+    )
 
     assert NGINX_CONF_PATH.exists(), f"nginx.conf not found at {NGINX_CONF_PATH}"
     content = NGINX_CONF_PATH.read_text()
     blocks = _parse_location_blocks(content)
 
     matched = _find_matching_block(blocks, match_path)
-    assert matched is not None, (
-        f"No location block matches path {path!r}"
-    )
+    assert matched is not None, f"No location block matches path {path!r}"
 
     pattern, body = matched
     assert _block_has_spa_fallback(body), (

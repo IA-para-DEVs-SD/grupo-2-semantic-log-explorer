@@ -13,6 +13,7 @@ from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
 # Upload Route Tests
 # ---------------------------------------------------------------------------
 
+
 class TestUploadRoute:
     """Tests for POST /api/upload endpoint."""
 
@@ -26,7 +27,9 @@ class TestUploadRoute:
         assert response.status_code == 400
         assert "Formato não suportado" in response.json()["detail"]
 
-    def test_rejects_file_exceeding_size_limit(self, test_app, mock_settings, mock_vectorstore, mock_llm_service):
+    def test_rejects_file_exceeding_size_limit(
+        self, test_app, mock_settings, mock_vectorstore, mock_llm_service
+    ):
         """Rejects file > 50MB → HTTP 413."""
         from backend.src.api.dependencies import (
             get_settings_dep,
@@ -125,7 +128,9 @@ class TestUploadRoute:
 
     def test_rejects_unsupported_extension_xml(self, client):
         """Rejects .xml file → HTTP 400."""
-        files = {"file": ("data.xml", io.BytesIO(b"<log>test</log>"), "application/xml")}
+        files = {
+            "file": ("data.xml", io.BytesIO(b"<log>test</log>"), "application/xml")
+        }
 
         response = client.post("/api/upload", files=files)
 
@@ -145,6 +150,7 @@ class TestUploadRoute:
 # Chat Route Tests
 # ---------------------------------------------------------------------------
 
+
 class TestChatRoute:
     """Tests for POST /api/chat endpoint."""
 
@@ -154,7 +160,9 @@ class TestChatRoute:
 
         assert response.status_code == 422
 
-    def test_rejects_chat_when_no_logs_indexed(self, test_app, mock_settings, mock_llm_service):
+    def test_rejects_chat_when_no_logs_indexed(
+        self, test_app, mock_settings, mock_llm_service
+    ):
         """Rejects chat when no logs indexed → HTTP 400."""
         from backend.src.api.dependencies import (
             get_vectorstore_service,
@@ -165,7 +173,9 @@ class TestChatRoute:
         empty_vectorstore._collection = MagicMock()
         empty_vectorstore._collection.count.return_value = 0
 
-        test_app.dependency_overrides[get_vectorstore_service] = lambda: empty_vectorstore
+        test_app.dependency_overrides[get_vectorstore_service] = lambda: (
+            empty_vectorstore
+        )
 
         client = TestClient(test_app)
         response = client.post("/api/chat", json={"question": "What errors occurred?"})

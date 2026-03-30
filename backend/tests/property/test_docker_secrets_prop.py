@@ -32,24 +32,24 @@ FRONTEND_DOCKERFILE = PROJECT_ROOT / "frontend" / "Dockerfile"
 
 # Known secret prefixes (case-sensitive where appropriate)
 _SECRET_PREFIXES = (
-    "sk-",        # OpenAI / Stripe secret keys
-    "sk_live_",   # Stripe live keys
-    "sk_test_",   # Stripe test keys
-    "AIza",       # Google API keys
-    "ghp_",       # GitHub personal access tokens
-    "gho_",       # GitHub OAuth tokens
-    "ghs_",       # GitHub server tokens
+    "sk-",  # OpenAI / Stripe secret keys
+    "sk_live_",  # Stripe live keys
+    "sk_test_",  # Stripe test keys
+    "AIza",  # Google API keys
+    "ghp_",  # GitHub personal access tokens
+    "gho_",  # GitHub OAuth tokens
+    "ghs_",  # GitHub server tokens
     "github_pat_",  # GitHub fine-grained PATs
-    "xoxb-",      # Slack bot tokens
-    "xoxp-",      # Slack user tokens
-    "AKIA",       # AWS access key IDs
-    "eyJ",        # JWT tokens (base64 of '{"')
+    "xoxb-",  # Slack bot tokens
+    "xoxp-",  # Slack user tokens
+    "AKIA",  # AWS access key IDs
+    "eyJ",  # JWT tokens (base64 of '{"')
 )
 
 # Patterns that look like secrets
 _SECRET_PATTERNS = [
     re.compile(r"^[A-Za-z0-9+/=_-]{32,}$"),  # Long base64-like strings
-    re.compile(r"^[0-9a-f]{32,}$"),            # Long hex strings (MD5+)
+    re.compile(r"^[0-9a-f]{32,}$"),  # Long hex strings (MD5+)
     re.compile(r"password", re.IGNORECASE),
     re.compile(r"secret", re.IGNORECASE),
     re.compile(r"token", re.IGNORECASE),
@@ -143,22 +143,24 @@ _secret_strategy = st.one_of(
 
 # Strategy: safe values that should NOT be flagged
 _safe_value_strategy = st.one_of(
-    st.sampled_from([
-        "/app",
-        "/api",
-        "8000",
-        "80",
-        "production",
-        "development",
-        "true",
-        "false",
-        "log_chunks",
-        ".log,.txt,.json",
-        "50",
-        "utf-8",
-        "INFO",
-        "DEBUG",
-    ]),
+    st.sampled_from(
+        [
+            "/app",
+            "/api",
+            "8000",
+            "80",
+            "production",
+            "development",
+            "true",
+            "false",
+            "log_chunks",
+            ".log,.txt,.json",
+            "50",
+            "utf-8",
+            "INFO",
+            "DEBUG",
+        ]
+    ),
     st.from_regex(r"[a-z]{1,10}", fullmatch=True),
     st.from_regex(r"[0-9]{1,5}", fullmatch=True),
     st.from_regex(r"/[a-z]{1,8}", fullmatch=True),
@@ -168,6 +170,7 @@ _safe_value_strategy = st.one_of(
 # ---------------------------------------------------------------------------
 # Property tests
 # ---------------------------------------------------------------------------
+
 
 @settings(max_examples=100)
 @given(secret=_secret_strategy)
@@ -208,7 +211,9 @@ def test_backend_dockerfile_has_no_secrets() -> None:
 
     **Validates: Requirements 5.3**
     """
-    assert BACKEND_DOCKERFILE.exists(), f"Backend Dockerfile not found: {BACKEND_DOCKERFILE}"
+    assert BACKEND_DOCKERFILE.exists(), (
+        f"Backend Dockerfile not found: {BACKEND_DOCKERFILE}"
+    )
     content = BACKEND_DOCKERFILE.read_text()
     pairs = _parse_env_arg_values(content)
 
@@ -227,7 +232,9 @@ def test_frontend_dockerfile_has_no_secrets() -> None:
 
     **Validates: Requirements 5.3**
     """
-    assert FRONTEND_DOCKERFILE.exists(), f"Frontend Dockerfile not found: {FRONTEND_DOCKERFILE}"
+    assert FRONTEND_DOCKERFILE.exists(), (
+        f"Frontend Dockerfile not found: {FRONTEND_DOCKERFILE}"
+    )
     content = FRONTEND_DOCKERFILE.read_text()
     pairs = _parse_env_arg_values(content)
 

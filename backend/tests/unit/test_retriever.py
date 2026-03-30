@@ -35,7 +35,9 @@ def _fake_embed_content_response(*, model=None, content=None, **kwargs):
     texts = content
     if isinstance(texts, str):
         return {"embedding": _fake_embedding()}
-    return {"embedding": [_fake_embedding(value=0.1 + i * 0.01) for i in range(len(texts))]}
+    return {
+        "embedding": [_fake_embedding(value=0.1 + i * 0.01) for i in range(len(texts))]
+    }
 
 
 def _make_chunk(
@@ -58,6 +60,7 @@ def _make_chunk(
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def service_with_data():
     """VectorStoreService pre-loaded with 3 chunks."""
@@ -66,9 +69,24 @@ def service_with_data():
         mock_genai.embed_content.side_effect = _fake_embed_content_response
         svc = VectorStoreService(s)
         chunks = [
-            _make_chunk("ERROR Connection refused to db:5432", "app.log", "2024-01-15 10:00:00", LogLevel.ERROR),
-            _make_chunk("INFO Application started successfully", "app.log", "2024-01-15 09:59:00", LogLevel.INFO),
-            _make_chunk("WARNING Disk usage at 85%", "system.log", "2024-01-15 10:01:00", LogLevel.WARNING),
+            _make_chunk(
+                "ERROR Connection refused to db:5432",
+                "app.log",
+                "2024-01-15 10:00:00",
+                LogLevel.ERROR,
+            ),
+            _make_chunk(
+                "INFO Application started successfully",
+                "app.log",
+                "2024-01-15 09:59:00",
+                LogLevel.INFO,
+            ),
+            _make_chunk(
+                "WARNING Disk usage at 85%",
+                "system.log",
+                "2024-01-15 10:01:00",
+                LogLevel.WARNING,
+            ),
         ]
         svc.add_chunks(chunks)
         yield svc
@@ -87,6 +105,7 @@ def empty_service():
 # ---------------------------------------------------------------------------
 # Basic retrieval
 # ---------------------------------------------------------------------------
+
 
 class TestRetrieve:
     def test_returns_list_of_chunks(self, service_with_data):
@@ -127,6 +146,7 @@ class TestRetrieve:
 # top_k clamping
 # ---------------------------------------------------------------------------
 
+
 class TestTopKClamping:
     def test_top_k_below_one_clamped_to_one(self, service_with_data):
         with patch("backend.src.services.vectorstore.genai") as mock_genai:
@@ -151,6 +171,7 @@ class TestTopKClamping:
 # ---------------------------------------------------------------------------
 # Metadata reconstruction
 # ---------------------------------------------------------------------------
+
 
 class TestMetadataReconstruction:
     def test_log_level_reconstructed_correctly(self, service_with_data):
@@ -181,11 +202,16 @@ class TestMetadataReconstruction:
             # Manually corrupt the stored metadata
             stored = svc._collection.get(include=["metadatas"])
             doc_id = stored["ids"][0]
-            svc._collection.update(ids=[doc_id], metadatas=[{
-                "filename": "app.log",
-                "timestamp": "",
-                "log_level": "INVALID_LEVEL",
-            }])
+            svc._collection.update(
+                ids=[doc_id],
+                metadatas=[
+                    {
+                        "filename": "app.log",
+                        "timestamp": "",
+                        "log_level": "INVALID_LEVEL",
+                    }
+                ],
+            )
 
             results = retrieve("error", svc, top_k=1)
         assert results[0].metadata.log_level == LogLevel.UNKNOWN

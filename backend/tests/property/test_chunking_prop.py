@@ -48,18 +48,20 @@ _log_line_strategy = st.builds(
 _module_name = st.from_regex(r"[a-z_]{3,10}", fullmatch=True)
 _line_number = st.integers(min_value=1, max_value=999)
 
-_exception_type = st.sampled_from([
-    "ValueError",
-    "TypeError",
-    "RuntimeError",
-    "KeyError",
-    "AttributeError",
-    "IndexError",
-    "IOError",
-    "ConnectionError",
-    "TimeoutError",
-    "FileNotFoundError",
-])
+_exception_type = st.sampled_from(
+    [
+        "ValueError",
+        "TypeError",
+        "RuntimeError",
+        "KeyError",
+        "AttributeError",
+        "IndexError",
+        "IOError",
+        "ConnectionError",
+        "TimeoutError",
+        "FileNotFoundError",
+    ]
+)
 
 _exception_message = st.from_regex(r"[a-z ]{3,20}", fullmatch=True)
 
@@ -120,6 +122,7 @@ def _log_with_stack_traces(draw):
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_upload(content: str, filename: str = "app.log") -> UploadFile:
     """Create a fake UploadFile from a string."""
     return UploadFile(
@@ -140,6 +143,7 @@ def _run_async(coro):
 # ---------------------------------------------------------------------------
 # Property test
 # ---------------------------------------------------------------------------
+
 
 @settings(max_examples=200)
 @given(data=_log_with_stack_traces())
@@ -171,15 +175,11 @@ def test_chunking_preserves_complete_stack_traces(
         # We check that ALL lines of a given trace are in the SAME chunk.
         # Note: chunk text is stripped by _flush_chunk, so we strip trace
         # lines for comparison as well.
-        trace_lines = [
-            line.strip() for line in trace.splitlines() if line.strip()
-        ]
+        trace_lines = [line.strip() for line in trace.splitlines() if line.strip()]
 
         # Find which chunks contain the first line of this trace
         containing_chunks = [
-            idx
-            for idx, text in enumerate(all_chunk_texts)
-            if trace_lines[0] in text
+            idx for idx, text in enumerate(all_chunk_texts) if trace_lines[0] in text
         ]
 
         assert len(containing_chunks) >= 1, (
