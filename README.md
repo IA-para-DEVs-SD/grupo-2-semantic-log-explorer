@@ -21,6 +21,7 @@ Projeto desenvolvido durante o curso de Inteligência Artificial Generativa — 
 | Embeddings | `text-embedding-004` (Google) |
 | Frontend | VueJS 3 (Composition API) |
 | Package Managers | UV (backend), NPM (frontend) |
+| Linter / Formatter | Ruff |
 | Containerização | Docker / Docker Compose |
 
 ## 📦 Instruções de Instalação / Uso
@@ -69,6 +70,17 @@ cd frontend
 npm install
 npm run dev
 ```
+
+### Linter / Formatter (Ruff)
+
+O projeto usa [Ruff](https://docs.astral.sh/ruff/) para linting e formatação do código Python. Para rodar manualmente:
+
+```bash
+ruff check --fix backend/
+ruff format backend/
+```
+
+Um hook Kiro executa esses comandos automaticamente ao salvar arquivos `.py`.
 
 ### Execução com Docker
 
