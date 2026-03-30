@@ -1,0 +1,64 @@
+name: Backend Tests
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [feature/*]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_API_KEY: test-key-for-ci
+    defaults:
+      run:
+        working-directory: backend/
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync --extra test
+
+      - name: Run unit tests with coverage
+        run: uv run pytest -m unit --cov --cov-report=term-missing --cov-report=html
+        env:
+          PYTHONPATH: src
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: backend/htmlcov/
+
+  property-tests:
+    name: Property Tests
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_API_KEY: test-key-for-ci
+    defaults:
+      run:
+        working-directory: backend/
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync --extra test
+
+      - name: Run property tests
+        run: uv run pytest -m property
+        env:
+          PYTHONPATH: src

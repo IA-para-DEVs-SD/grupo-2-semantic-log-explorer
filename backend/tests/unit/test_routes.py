@@ -1,89 +1,12 @@
 """Unit tests for API routes — upload and chat endpoints."""
 
 import io
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
-import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from httpx import ASGITransport, AsyncClient
 
-from backend.src.api.routes.upload import router as upload_router
-from backend.src.api.routes.chat import router as chat_router
 from backend.src.core.config import Settings
 from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-
-
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
-
-@pytest.fixture
-def mock_settings():
-    """Create mock Settings for testing."""
-    return Settings(
-        GOOGLE_API_KEY="test-api-key",
-        CHROMA_COLLECTION_NAME="test_collection",
-        MAX_FILE_SIZE_MB=50,
-        ALLOWED_EXTENSIONS={".log", ".txt", ".json"},
-    )
-
-
-@pytest.fixture
-def mock_vectorstore():
-    """Create mock VectorStoreService."""
-    mock = MagicMock()
-    mock.add_chunks.return_value = 3
-    mock._collection = MagicMock()
-    mock._collection.count.return_value = 5
-    return mock
-
-
-@pytest.fixture
-def mock_llm_service():
-    """Create mock LLMService."""
-    mock = MagicMock()
-
-    async def mock_stream(*args, **kwargs):
-        yield "Test response"
-        yield " from LLM"
-
-    mock.generate_stream = mock_stream
-    return mock
-
-
-@pytest.fixture
-def app(mock_settings, mock_vectorstore, mock_llm_service):
-    """Create FastAPI app with mocked dependencies."""
-    from backend.src.api.dependencies import (
-        get_settings_dep,
-        get_vectorstore_service,
-        get_llm_service,
-    )
-
-    test_app = FastAPI()
-    test_app.include_router(upload_router, prefix="/api")
-    test_app.include_router(chat_router, prefix="/api")
-
-    test_app.dependency_overrides[get_settings_dep] = lambda: mock_settings
-    test_app.dependency_overrides[get_vectorstore_service] = lambda: mock_vectorstore
-    test_app.dependency_overrides[get_llm_service] = lambda: mock_llm_service
-
-    return test_app
-
-
-@pytest.fixture
-def client(app):
-    """Create synchronous test client."""
-    return TestClient(app)
-
-
-@pytest.fixture
-async def async_client(app):
-    """Create async test client."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
 
 
 # ---------------------------------------------------------------------------
@@ -103,12 +26,10 @@ class TestUploadRoute:
         assert response.status_code == 400
         assert "Formato não suportado" in response.json()["detail"]
 
-    def test_rejects_file_exceeding_size_limit(self, app, mock_settings, mock_vectorstore, mock_llm_service):
+    def test_rejects_file_exceeding_size_limit(self, test_app, mock_settings, mock_vectorstore, mock_llm_service):
         """Rejects file > 50MB → HTTP 413."""
         from backend.src.api.dependencies import (
             get_settings_dep,
-            get_vectorstore_service,
-            get_llm_service,
         )
 
         # Override settings with 1MB limit for easier testing
@@ -118,9 +39,9 @@ class TestUploadRoute:
             MAX_FILE_SIZE_MB=1,
             ALLOWED_EXTENSIONS={".log", ".txt", ".json"},
         )
-        app.dependency_overrides[get_settings_dep] = lambda: small_limit_settings
+        test_app.dependency_overrides[get_settings_dep] = lambda: small_limit_settings
 
-        client = TestClient(app)
+        client = TestClient(test_app)
 
         # Create file larger than 1MB
         large_content = b"x" * (2 * 1024 * 1024)  # 2MB
@@ -233,12 +154,10 @@ class TestChatRoute:
 
         assert response.status_code == 422
 
-    def test_rejects_chat_when_no_logs_indexed(self, app, mock_settings, mock_llm_service):
+    def test_rejects_chat_when_no_logs_indexed(self, test_app, mock_settings, mock_llm_service):
         """Rejects chat when no logs indexed → HTTP 400."""
         from backend.src.api.dependencies import (
-            get_settings_dep,
             get_vectorstore_service,
-            get_llm_service,
         )
 
         # Create vectorstore mock with empty collection
@@ -246,9 +165,9 @@ class TestChatRoute:
         empty_vectorstore._collection = MagicMock()
         empty_vectorstore._collection.count.return_value = 0
 
-        app.dependency_overrides[get_vectorstore_service] = lambda: empty_vectorstore
+        test_app.dependency_overrides[get_vectorstore_service] = lambda: empty_vectorstore
 
-        client = TestClient(app)
+        client = TestClient(test_app)
         response = client.post("/api/chat", json={"question": "What errors occurred?"})
 
         assert response.status_code == 400
@@ -312,4 +231,3 @@ class TestChatRoute:
         response = client.post("/api/chat", json={"question": "What happened?"})
 
         assert response.status_code == 200
-
