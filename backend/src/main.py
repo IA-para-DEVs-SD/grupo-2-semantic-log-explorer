@@ -6,8 +6,11 @@ from fastapi.responses import JSONResponse
 
 from backend.src.api.routes.upload import router as upload_router
 from backend.src.api.routes.chat import router as chat_router
+from backend.src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
+
+settings = get_settings()
 
 app = FastAPI(
     title="Semantic Log Explorer",
@@ -17,10 +20,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Accept"],
 )
 
 app.include_router(upload_router, prefix="/api", tags=["upload"])

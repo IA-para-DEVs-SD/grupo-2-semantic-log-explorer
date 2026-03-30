@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     CHROMA_COLLECTION_NAME: str = "log_chunks"
     MAX_FILE_SIZE_MB: int = 50
     ALLOWED_EXTENSIONS: set[str] = {".log", ".txt", ".json"}
+    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:80"]
 
     model_config = {
         "env_file": ".env",
