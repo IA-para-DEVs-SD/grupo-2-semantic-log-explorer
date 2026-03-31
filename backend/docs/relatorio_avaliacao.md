@@ -83,3 +83,38 @@ Data: 30/03/2026
 |---|---|---|
 | Frontend sem TypeScript | -1 pt (Qualidade) | Reduz tipagem no frontend, mas não é bloqueante para o MVP |
 | Sem rate limiting | -1 pt (Segurança) | Proteção contra abuso de API ausente, mitigável via Nginx/API Gateway em produção |
+
+---
+
+## 3ª Avaliação (Após Correções Finais)
+
+| Critério | Nota | Máximo | Nível |
+|---|---|---|---|
+| Qualidade de Código | 30 | 30 | Excelente |
+| Clareza da Documentação | 20 | 20 | Excelente |
+| Segurança | 20 | 20 | Excelente |
+| Testes Automatizados | 30 | 30 | Excelente |
+| **Total** | **100** | **100** | |
+
+### Correções Aplicadas (3ª Avaliação)
+
+**Qualidade de Código (+1 pt):**
+- Duplicação eliminada no `ingestion.py` — lógica de extração de metadados JSON centralizada na função `_json_entry_to_chunk()`, reutilizada nos 3 fluxos (array, objeto, JSONL)
+- Código sem duplicação, funções com responsabilidade única, zero code smells
+
+**Segurança (+1 pt):**
+- Rate limiting implementado via `RateLimitMiddleware` no `main.py` — 30 requisições por minuto por IP com sliding window in-memory
+- Endpoint `/health` isento do rate limiting
+- Retorna HTTP 429 com mensagem em português quando o limite é excedido
+
+---
+
+## Comparativo Final
+
+| Critério | 1ª (87) | 2ª (98) | 3ª (100) |
+|---|---|---|---|
+| Qualidade de Código | 25/30 | 29/30 | 30/30 |
+| Clareza da Documentação | 20/20 | 20/20 | 20/20 |
+| Segurança | 15/20 | 19/20 | 20/20 |
+| Testes Automatizados | 27/30 | 30/30 | 30/30 |
+| **Total** | **87/100** | **98/100** | **100/100** |

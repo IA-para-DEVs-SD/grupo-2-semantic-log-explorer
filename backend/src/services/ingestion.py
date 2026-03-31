@@ -163,67 +163,54 @@ def _flush_chunk(lines: list[str], filename: str, chunks: list[Chunk]) -> None:
     )
 
 
+def _json_entry_to_chunk(entry: dict, filename: str) -> Chunk:
+    """Convert a JSON dict entry into a sanitized Chunk with metadata.
+
+    Args:
+        entry: Parsed JSON object representing a log entry.
+        filename: Source filename for metadata.
+
+    Returns:
+        Chunk with sanitized text and extracted metadata.
+    """
+    text = json.dumps(entry, ensure_ascii=False)
+    text = _clean_noise(text)
+    text = sanitize_pii(text)
+
+    timestamp = entry.get("timestamp") or entry.get("time")
+    level_str = (
+        entry.get("level", "")
+        or entry.get("log_level", "")
+        or entry.get("severity", "")
+    ).upper()
+    log_level = (
+        LogLevel(level_str) if level_str in _VALID_LOG_LEVELS else LogLevel.UNKNOWN
+    )
+
+    return Chunk(
+        text=text,
+        metadata=ChunkMetadata(
+            filename=filename,
+            timestamp=str(timestamp) if timestamp else None,
+            log_level=log_level,
+        ),
+    )
+
+
 def _process_json_content(content: str, filename: str) -> list[Chunk]:
     """Processa conteúdo JSON — array de objetos ou JSONL."""
     chunks: list[Chunk] = []
 
-    # Tenta como JSON array
+    # Tenta como JSON array ou objeto
     try:
         data = json.loads(content)
         if isinstance(data, list):
             for entry in data:
                 if isinstance(entry, dict):
-                    text = json.dumps(entry, ensure_ascii=False)
-                    text = _clean_noise(text)
-                    text = sanitize_pii(text)
-                    timestamp = entry.get("timestamp") or entry.get("time")
-                    level_str = (
-                        entry.get("level", "")
-                        or entry.get("log_level", "")
-                        or entry.get("severity", "")
-                    ).upper()
-                    log_level = (
-                        LogLevel(level_str)
-                        if level_str in _VALID_LOG_LEVELS
-                        else LogLevel.UNKNOWN
-                    )
-                    chunks.append(
-                        Chunk(
-                            text=text,
-                            metadata=ChunkMetadata(
-                                filename=filename,
-                                timestamp=str(timestamp) if timestamp else None,
-                                log_level=log_level,
-                            ),
-                        )
-                    )
+                    chunks.append(_json_entry_to_chunk(entry, filename))
             return chunks if chunks else _fallback_single_chunk(content, filename)
-        # Single object
         if isinstance(data, dict):
-            text = json.dumps(data, ensure_ascii=False)
-            text = _clean_noise(text)
-            text = sanitize_pii(text)
-            timestamp = data.get("timestamp") or data.get("time")
-            level_str = (
-                data.get("level", "")
-                or data.get("log_level", "")
-                or data.get("severity", "")
-            ).upper()
-            log_level = (
-                LogLevel(level_str)
-                if level_str in _VALID_LOG_LEVELS
-                else LogLevel.UNKNOWN
-            )
-            return [
-                Chunk(
-                    text=text,
-                    metadata=ChunkMetadata(
-                        filename=filename,
-                        timestamp=str(timestamp) if timestamp else None,
-                        log_level=log_level,
-                    ),
-                )
-            ]
+            return [_json_entry_to_chunk(data, filename)]
     except (json.JSONDecodeError, ValueError):
         pass
 
@@ -235,30 +222,7 @@ def _process_json_content(content: str, filename: str) -> list[Chunk]:
         try:
             entry = json.loads(raw_line)
             if isinstance(entry, dict):
-                text = json.dumps(entry, ensure_ascii=False)
-                text = _clean_noise(text)
-                text = sanitize_pii(text)
-                timestamp = entry.get("timestamp") or entry.get("time")
-                level_str = (
-                    entry.get("level", "")
-                    or entry.get("log_level", "")
-                    or entry.get("severity", "")
-                ).upper()
-                log_level = (
-                    LogLevel(level_str)
-                    if level_str in _VALID_LOG_LEVELS
-                    else LogLevel.UNKNOWN
-                )
-                chunks.append(
-                    Chunk(
-                        text=text,
-                        metadata=ChunkMetadata(
-                            filename=filename,
-                            timestamp=str(timestamp) if timestamp else None,
-                            log_level=log_level,
-                        ),
-                    )
-                )
+                chunks.append(_json_entry_to_chunk(entry, filename))
         except (json.JSONDecodeError, ValueError):
             continue
 
