@@ -44,7 +44,9 @@ def _fake_embed_content_response(*, model=None, content=None, **kwargs):
     texts = content
     if isinstance(texts, str):
         return {"embedding": _fake_embedding()}
-    return {"embedding": [_fake_embedding(value=0.1 + i * 0.01) for i in range(len(texts))]}
+    return {
+        "embedding": [_fake_embedding(value=0.1 + i * 0.01) for i in range(len(texts))]
+    }
 
 
 def _make_chunk(
@@ -67,6 +69,7 @@ def _make_chunk(
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture()
 def settings():
@@ -92,9 +95,24 @@ def service_with_data():
         mock_genai.embed_content.side_effect = _fake_embed_content_response
         svc = VectorStoreService(s)
         chunks = [
-            _make_chunk("ERROR Connection refused to db:5432", "app.log", "2024-01-15 10:00:00", LogLevel.ERROR),
-            _make_chunk("INFO Application started successfully", "app.log", "2024-01-15 09:59:00", LogLevel.INFO),
-            _make_chunk("WARNING Disk usage at 85%", "system.log", "2024-01-15 10:01:00", LogLevel.WARNING),
+            _make_chunk(
+                "ERROR Connection refused to db:5432",
+                "app.log",
+                "2024-01-15 10:00:00",
+                LogLevel.ERROR,
+            ),
+            _make_chunk(
+                "INFO Application started successfully",
+                "app.log",
+                "2024-01-15 09:59:00",
+                LogLevel.INFO,
+            ),
+            _make_chunk(
+                "WARNING Disk usage at 85%",
+                "system.log",
+                "2024-01-15 10:01:00",
+                LogLevel.WARNING,
+            ),
         ]
         svc.add_chunks(chunks)
         yield svc
@@ -103,6 +121,7 @@ def service_with_data():
 # ---------------------------------------------------------------------------
 # Ephemeral mode
 # ---------------------------------------------------------------------------
+
 
 class TestEphemeralMode:
     def test_chromadb_client_is_ephemeral(self, service):
@@ -121,6 +140,7 @@ class TestEphemeralMode:
 # ---------------------------------------------------------------------------
 # add_chunks
 # ---------------------------------------------------------------------------
+
 
 class TestAddChunks:
     def test_returns_count_of_chunks_added(self, service):
@@ -176,6 +196,7 @@ class TestAddChunks:
 # search
 # ---------------------------------------------------------------------------
 
+
 class TestSearch:
     def test_returns_results_with_expected_keys(self, service_with_data):
         query_emb = _fake_embedding()
@@ -216,6 +237,7 @@ class TestSearch:
 # clear_collection
 # ---------------------------------------------------------------------------
 
+
 class TestClearCollection:
     def test_removes_all_stored_data(self, service_with_data):
         # Confirm data exists first
@@ -245,6 +267,7 @@ class TestClearCollection:
 # ---------------------------------------------------------------------------
 # Error handling
 # ---------------------------------------------------------------------------
+
 
 class TestErrorHandling:
     def test_embedding_failure_raises_502(self, settings):
@@ -276,14 +299,18 @@ class TestErrorHandling:
             mock_genai.embed_content.side_effect = _fake_embed_content_response
             svc = VectorStoreService(settings)
 
-            svc._collection.query = MagicMock(side_effect=RuntimeError("connection lost"))
+            svc._collection.query = MagicMock(
+                side_effect=RuntimeError("connection lost")
+            )
             with pytest.raises(HTTPException) as exc_info:
                 svc.search(_fake_embedding(), top_k=5)
             assert exc_info.value.status_code == 503
 
     def test_chromadb_init_failure_raises_503(self):
-        with patch("backend.src.services.vectorstore.genai"), \
-             patch("backend.src.services.vectorstore.chromadb") as mock_chroma:
+        with (
+            patch("backend.src.services.vectorstore.genai"),
+            patch("backend.src.services.vectorstore.chromadb") as mock_chroma,
+        ):
             mock_chroma.Client.side_effect = RuntimeError("cannot start")
             with pytest.raises(HTTPException) as exc_info:
                 VectorStoreService(_fake_settings())

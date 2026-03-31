@@ -1,0 +1,29 @@
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.pytest_cache
+**/.hypothesis
+**/.venv
+
+# Environment files (secrets must not be baked into images)
+**/.env
+
+# Git
+.git
+.gitignore
+
+# IDE
+**/.vscode
+**/.idea
+
+# Kiro
+.kiro
+
+# Frontend (not needed for backend Dockerfile)
+frontend/node_modules
+
+# Documentation
+**/docs
+README.md
+prompts.txt

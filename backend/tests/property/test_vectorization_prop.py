@@ -79,6 +79,7 @@ _chunks_strategy = st.lists(_chunk_strategy, min_size=1, max_size=5)
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _fake_settings() -> Settings:
     return Settings(
         GOOGLE_API_KEY=FAKE_API_KEY,
@@ -97,6 +98,7 @@ def _fake_embed_content_response(*, model=None, content=None, **kwargs):
 # ---------------------------------------------------------------------------
 # Property test
 # ---------------------------------------------------------------------------
+
 
 @settings(max_examples=100)
 @given(chunks=_chunks_strategy)

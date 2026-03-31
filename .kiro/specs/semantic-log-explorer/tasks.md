@@ -34,23 +34,23 @@
 - [x] 6.3 [PBT] Escrever teste de propriedade em `backend/tests/property/test_prompt_assembly_prop.py` — Feature: semantic-log-explorer, Property 7: Montagem do prompt inclui papel e contexto
 
 ## 7. Rotas da API (Upload e Chat)
-- [ ] 7.1 Criar `backend/src/api/routes/upload.py` com POST /api/upload (validação de formato e tamanho, orquestração do pipeline de ingestão)
-- [ ] 7.2 Criar `backend/src/api/routes/chat.py` com POST /api/chat (orquestração retriever → LLM → StreamingResponse SSE)
-- [ ] 7.3 Escrever testes unitários em `backend/tests/unit/test_routes.py` para rotas de upload e chat (validações, edge cases, erros)
-- [ ] 7.4 [PBT] Escrever teste de propriedade em `backend/tests/property/test_file_validation_prop.py` — Feature: semantic-log-explorer, Property 1: Validação de formato de arquivo
-- [ ] 7.5 [PBT] Escrever teste de propriedade em `backend/tests/property/test_upload_response_prop.py` — Feature: semantic-log-explorer, Property 3: Resposta de upload contém campos obrigatórios
-- [ ] 7.6 [PBT] Escrever teste de propriedade em `backend/tests/property/test_sse_format_prop.py` — Feature: semantic-log-explorer, Property 9: Resposta de chat utiliza formato SSE
+- [x] 7.1 Criar `backend/src/api/routes/upload.py` com POST /api/upload (validação de formato e tamanho, orquestração do pipeline de ingestão)
+- [x] 7.2 Criar `backend/src/api/routes/chat.py` com POST /api/chat (orquestração retriever → LLM → StreamingResponse SSE)
+- [x] 7.3 Escrever testes unitários em `backend/tests/unit/test_routes.py` para rotas de upload e chat (validações, edge cases, erros)
+- [x] 7.4 [PBT] Escrever teste de propriedade em `backend/tests/property/test_file_validation_prop.py` — Feature: semantic-log-explorer, Property 1: Validação de formato de arquivo
+- [x] 7.5 [PBT] Escrever teste de propriedade em `backend/tests/property/test_upload_response_prop.py` — Feature: semantic-log-explorer, Property 3: Resposta de upload contém campos obrigatórios
+- [x] 7.6 [PBT] Escrever teste de propriedade em `backend/tests/property/test_sse_format_prop.py` — Feature: semantic-log-explorer, Property 9: Resposta de chat utiliza formato SSE
 
 ## 8. Configuração do Frontend
-- [ ] 8.1 Inicializar projeto VueJS 3 em `frontend/` com Vite, Composition API e dependências (markdown-it ou marked para renderização Markdown)
-- [ ] 8.2 Criar `frontend/src/assets/styles.css` com estilos minimalistas (estilo Shadcn UI)
-- [ ] 8.3 Configurar `frontend/src/main.js` e `frontend/src/App.vue` com layout principal
+- [x] 8.1 Inicializar projeto VueJS 3 em `frontend/` com Vite, Composition API e dependências (markdown-it ou marked para renderização Markdown)
+- [x] 8.2 Criar `frontend/src/assets/styles.css` com estilos minimalistas (estilo Shadcn UI)
+- [x] 8.3 Configurar `frontend/src/main.js` e `frontend/src/App.vue` com layout principal
 
 ## 9. Componentes do Frontend
-- [ ] 9.1 Criar `frontend/src/components/FileUpload.vue` com upload drag-and-drop, validação de formato (.log, .txt, .json), exibição de progresso e confirmação/erro
-- [ ] 9.2 Criar `frontend/src/components/ChatWindow.vue` com área de conversa, scroll automático, campo de entrada e estado de loading
-- [ ] 9.3 Criar `frontend/src/components/MessageBubble.vue` com renderização de mensagens (usuário/IA), suporte a Markdown e blocos de código formatados
-- [ ] 9.4 Criar `frontend/src/composables/useChat.js` com lógica de comunicação API, consumo de SSE, gerenciamento de estado (mensagens, loading, erro)
+- [x] 9.1 Criar `frontend/src/components/FileUpload.vue` com upload drag-and-drop, validação de formato (.log, .txt, .json), exibição de progresso e confirmação/erro
+- [x] 9.2 Criar `frontend/src/components/ChatWindow.vue` com área de conversa, scroll automático, campo de entrada e estado de loading
+- [x] 9.3 Criar `frontend/src/components/MessageBubble.vue` com renderização de mensagens (usuário/IA), suporte a Markdown e blocos de código formatados
+- [x] 9.4 Criar `frontend/src/composables/useChat.js` com lógica de comunicação API, consumo de SSE, gerenciamento de estado (mensagens, loading, erro)
 
 ## 10. Testes do Frontend
 - [ ] 10.1 Escrever testes unitários em `frontend/tests/unit/FileUpload.test.js` para componente de upload
@@ -59,9 +59,9 @@
 - [ ] 10.4 Escrever testes unitários em `frontend/tests/unit/useChat.test.js` para composable de comunicação API
 
 ## 11. Configuração de Testes do Backend
-- [ ] 11.1 Criar `backend/tests/conftest.py` com fixtures compartilhadas (test client async, ChromaDB efêmero de teste, mocks de API externa)
-- [ ] 11.2 Escrever testes unitários em `backend/tests/unit/test_config.py` para carregamento de configurações e falha sem GOOGLE_API_KEY
+- [x] 11.1 Criar `backend/tests/conftest.py` com fixtures compartilhadas (test client async, ChromaDB efêmero de teste, mocks de API externa)
+- [x] 11.2 Escrever testes unitários em `backend/tests/unit/test_config.py` para carregamento de configurações e falha sem GOOGLE_API_KEY
 
 ## 12. Docker e Integração
-- [ ] 12.1 Atualizar `Dockerfile` se necessário para incluir dependências de teste e configuração de produção
-- [ ] 12.2 Atualizar `docker-compose.yml` se necessário para garantir orquestração correta dos serviços com variáveis de ambiente
+- [x] 12.1 Atualizar `Dockerfile` se necessário para incluir dependências de teste e configuração de produção
+- [x] 12.2 Atualizar `docker-compose.yml` se necessário para garantir orquestração correta dos serviços com variáveis de ambiente
