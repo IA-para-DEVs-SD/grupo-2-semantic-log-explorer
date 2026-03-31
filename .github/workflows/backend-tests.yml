@@ -28,7 +28,7 @@ jobs:
         run: uv sync --extra test
 
       - name: Run unit tests with coverage
-        run: uv run pytest -m unit --cov --cov-report=term-missing --cov-report=html
+        run: uv run pytest -m unit --cov --cov-report=term-missing --cov-report=html --cov-fail-under=80
         env:
           PYTHONPATH: ..
 

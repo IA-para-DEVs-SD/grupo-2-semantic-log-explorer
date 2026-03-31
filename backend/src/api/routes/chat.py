@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from backend.src.api.dependencies import get_llm_service, get_vectorstore_service
+from backend.src.core.security import sanitize_prompt_injection
 from backend.src.models.schemas import ChatRequest
 from backend.src.services.llm import LLMService
 from backend.src.services.retriever import retrieve
@@ -92,7 +93,7 @@ async def chat(
 
     return StreamingResponse(
         generate_sse_stream(
-            question=request.question,
+            question=sanitize_prompt_injection(request.question),
             vectorstore=vectorstore,
             llm_service=llm_service,
         ),
