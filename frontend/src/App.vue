@@ -7,15 +7,22 @@
 import { ref } from 'vue'
 import FileUpload from './components/FileUpload.vue'
 import ChatWindow from './components/ChatWindow.vue'
+import LogSelector from './components/LogSelector.vue'
 
-const uploadedFile = ref(null)
+const selectedCollection = ref(null)
+const logSelectorRef = ref(null)
 
 const handleUploadSuccess = (fileInfo) => {
-  uploadedFile.value = fileInfo
+  // Refresh the log selector after upload
+  logSelectorRef.value?.refresh()
 }
 
 const handleUploadError = (error) => {
   console.error('Upload error:', error)
+}
+
+const handleLogSelect = (collection) => {
+  selectedCollection.value = collection
 }
 </script>
 
@@ -48,8 +55,16 @@ const handleUploadError = (error) => {
           />
         </section>
 
+        <section class="log-section">
+          <LogSelector
+            ref="logSelectorRef"
+            @select="handleLogSelect"
+            @deleted="() => {}"
+          />
+        </section>
+
         <section class="chat-section">
-          <ChatWindow />
+          <ChatWindow :collection="selectedCollection" />
         </section>
       </div>
     </main>
@@ -121,6 +136,10 @@ const handleUploadError = (error) => {
 }
 
 .upload-section {
+  flex-shrink: 0;
+}
+
+.log-section {
   flex-shrink: 0;
 }
 

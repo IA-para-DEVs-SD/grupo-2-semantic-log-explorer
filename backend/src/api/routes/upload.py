@@ -74,7 +74,7 @@ async def upload_file(
     chunks = await process_file(file)
 
     # Store chunks in vector store
-    chunk_count = vectorstore.add_chunks(chunks)
+    chunk_count, collection_name = vectorstore.add_chunks(chunks, filename)
 
     return UploadResponse(
         status="indexed",

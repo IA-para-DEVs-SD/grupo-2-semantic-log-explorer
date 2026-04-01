@@ -3,6 +3,7 @@ import time
 from collections import defaultdict
 
 from src.api.routes.chat import router as chat_router
+from src.api.routes.logs import router as logs_router
 from src.api.routes.upload import router as upload_router
 from src.core.config import get_settings
 from fastapi import FastAPI, Request
@@ -76,6 +77,7 @@ app.add_middleware(
 
 app.include_router(upload_router, prefix="/api", tags=["upload"])
 app.include_router(chat_router, prefix="/api", tags=["chat"])
+app.include_router(logs_router, prefix="/api", tags=["logs"])
 
 
 @app.exception_handler(Exception)

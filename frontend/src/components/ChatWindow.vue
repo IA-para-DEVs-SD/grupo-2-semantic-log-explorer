@@ -8,6 +8,13 @@ import { ref, watch, nextTick } from 'vue'
 import MessageBubble from './MessageBubble.vue'
 import { useChat } from '../composables/useChat.js'
 
+const props = defineProps({
+  collection: {
+    type: String,
+    default: null
+  }
+})
+
 const { messages, isLoading, isStreaming, error, sendMessage, clearError } = useChat()
 
 const inputText = ref('')
@@ -53,7 +60,7 @@ const handleSubmit = () => {
   const text = inputText.value.trim()
   if (!text || isLoading.value) return
   clearError()
-  sendMessage(text)
+  sendMessage(text, props.collection)
   inputText.value = ''
 }
 </script>
@@ -73,11 +80,12 @@ const handleSubmit = () => {
       </div>
 
       <MessageBubble
-        v-for="msg in messages"
+        v-for="(msg, index) in messages"
         :key="msg.id"
         :content="msg.content"
         :sender="msg.sender"
         :timestamp="msg.timestamp"
+        :streaming="isStreaming && msg.sender === 'ai' && index === messages.length - 1"
       />
 
       <!-- Loading indicator -->

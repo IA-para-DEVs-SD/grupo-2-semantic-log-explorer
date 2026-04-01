@@ -31,6 +31,14 @@ class UploadResponse(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
+    collection: str | None = Field(None, description="Collection name to query")
+
+
+class LogInfo(BaseModel):
+    collection: str
+    filename: str
+    chunks: int
+    uploaded_at: str
 
 
 class ErrorResponse(BaseModel):

@@ -9,6 +9,7 @@ class Settings(BaseSettings):
 
     GOOGLE_API_KEY: str
     CHROMA_COLLECTION_NAME: str = "log_chunks"
+    CHROMA_PERSIST_DIR: str = ".chromadb"
     MAX_FILE_SIZE_MB: int = 50
     ALLOWED_EXTENSIONS: set[str] = {".log", ".txt", ".json"}
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:80"]
