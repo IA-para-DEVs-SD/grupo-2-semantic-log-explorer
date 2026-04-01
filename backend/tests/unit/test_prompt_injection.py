@@ -1,8 +1,7 @@
 """Unit tests for prompt injection sanitization."""
 
-import pytest
 
-from backend.src.core.security import sanitize_prompt_injection
+from src.core.security import sanitize_prompt_injection
 
 
 class TestSanitizePromptInjection:

@@ -380,14 +380,14 @@ const dropzoneClasses = computed(() => ({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 2rem;
-  border: 2px dashed var(--border);
+  border: 2px dashed #cbd5e1;
   border-radius: var(--radius);
-  background-color: var(--muted);
+  background-color: var(--background);
   cursor: pointer;
-  transition: all 150ms ease;
-  min-height: 180px;
+  transition: all 200ms ease;
+  min-height: 160px;
 }
 
 .file-upload__dropzone:hover,
@@ -422,7 +422,7 @@ const dropzoneClasses = computed(() => ({
 }
 
 .file-upload__icon {
-  color: var(--muted-foreground);
+  color: #94a3b8;
 }
 
 .file-upload__dropzone:hover .file-upload__icon,
@@ -442,6 +442,7 @@ const dropzoneClasses = computed(() => ({
 
 .file-upload__link {
   color: var(--primary);
+  font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -455,9 +456,9 @@ const dropzoneClasses = computed(() => ({
 .file-upload__progress {
   width: 100%;
   max-width: 300px;
-  height: 8px;
-  background-color: var(--border);
-  border-radius: 4px;
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 3px;
   overflow: hidden;
   position: relative;
 }
@@ -466,6 +467,7 @@ const dropzoneClasses = computed(() => ({
   height: 100%;
   background-color: var(--primary);
   transition: width 150ms ease;
+  border-radius: 3px;
 }
 
 .file-upload__progress-text {
@@ -476,7 +478,6 @@ const dropzoneClasses = computed(() => ({
   font-size: 0.625rem;
   font-weight: 600;
   color: var(--foreground);
-  text-shadow: 0 0 2px var(--background);
 }
 
 .file-upload__result {
@@ -491,15 +492,15 @@ const dropzoneClasses = computed(() => ({
 }
 
 .file-upload__result--success {
-  background-color: hsl(142.1, 76.2%, 36.3%, 0.1);
-  border: 1px solid var(--success);
-  color: var(--success);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
 }
 
 .file-upload__result--error {
-  background-color: hsl(0, 84.2%, 60.2%, 0.1);
-  border: 1px solid var(--destructive);
-  color: var(--destructive);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
 }
 
 .file-upload__result-content {
@@ -524,7 +525,8 @@ const dropzoneClasses = computed(() => ({
 
 .file-upload__result-details {
   margin: 0.25rem 0 0 0;
-  opacity: 0.9;
+  opacity: 0.85;
+  font-size: 0.8125rem;
 }
 
 .file-upload__result-close {
@@ -540,7 +542,7 @@ const dropzoneClasses = computed(() => ({
   color: inherit;
   cursor: pointer;
   border-radius: 4px;
-  opacity: 0.7;
+  opacity: 0.6;
   transition: opacity 150ms ease;
 }
 

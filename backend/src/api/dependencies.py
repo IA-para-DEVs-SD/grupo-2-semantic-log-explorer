@@ -2,7 +2,7 @@
 
 from functools import lru_cache
 
-from backend.src.core.config import Settings, get_settings
+from src.core.config import Settings, get_settings
 
 
 def get_settings_dep() -> Settings:
@@ -13,7 +13,7 @@ def get_settings_dep() -> Settings:
 @lru_cache
 def _get_vectorstore_service():
     """Create and cache a singleton VectorStoreService."""
-    from backend.src.services.vectorstore import VectorStoreService
+    from src.services.vectorstore import VectorStoreService
 
     settings = get_settings()
     return VectorStoreService(settings=settings)
@@ -22,7 +22,7 @@ def _get_vectorstore_service():
 @lru_cache
 def _get_llm_service():
     """Create and cache a singleton LLMService."""
-    from backend.src.services.llm import LLMService
+    from src.services.llm import LLMService
 
     settings = get_settings()
     return LLMService(settings=settings)

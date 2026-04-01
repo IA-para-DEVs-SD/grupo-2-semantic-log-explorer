@@ -10,18 +10,15 @@ Validates: Requirements 1.1, 1.2
 """
 
 import io
-import string
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from hypothesis import given, settings, assume
-from hypothesis import strategies as st
+from src.api.routes.upload import router as upload_router
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from backend.src.api.routes.upload import router as upload_router
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-
+from hypothesis import assume, given, settings
+from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -59,7 +56,7 @@ _file_content_strategy = st.binary(min_size=1, max_size=1024)
 
 def create_test_app():
     """Create FastAPI app with mocked dependencies for testing."""
-    from backend.src.api.dependencies import (
+    from src.api.dependencies import (
         get_settings_dep,
         get_vectorstore_service,
     )
@@ -72,7 +69,7 @@ def create_test_app():
     )
 
     mock_vectorstore = MagicMock()
-    mock_vectorstore.add_chunks.return_value = 1
+    mock_vectorstore.add_chunks.return_value = (1, "test_collection")
 
     test_app = FastAPI()
     test_app.include_router(upload_router, prefix="/api")
@@ -106,7 +103,7 @@ def test_valid_extensions_are_accepted(
     filename = f"{filename_base}{valid_extension}"
 
     # Mock process_file to avoid actual processing
-    with patch("backend.src.api.routes.upload.process_file") as mock_process_file:
+    with patch("src.api.routes.upload.process_file") as mock_process_file:
         mock_process_file.return_value = [
             Chunk(
                 text="test log content",

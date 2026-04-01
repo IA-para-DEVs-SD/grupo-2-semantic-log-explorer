@@ -9,11 +9,10 @@ o prompt montado pelo Serviço_LLM deve conter a instrução de papel
 **Validates: Requirements 12.1, 12.2**
 """
 
-from hypothesis import given, settings, assume
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
+from src.services.llm import SYSTEM_PROMPT, build_prompt
+from hypothesis import assume, given, settings
 from hypothesis import strategies as st
-
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-from backend.src.services.llm import SYSTEM_PROMPT, build_prompt
 
 # ---------------------------------------------------------------------------
 # Strategies

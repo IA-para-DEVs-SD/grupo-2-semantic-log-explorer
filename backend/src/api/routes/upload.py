@@ -6,13 +6,12 @@ e orquestra o pipeline de ingestão (limpeza → sanitização → chunking → 
 
 from pathlib import Path
 
+from src.api.dependencies import get_settings_dep, get_vectorstore_service
+from src.core.config import Settings
+from src.models.schemas import UploadResponse
+from src.services.ingestion import process_file
+from src.services.vectorstore import VectorStoreService
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
-
-from backend.src.api.dependencies import get_settings_dep, get_vectorstore_service
-from backend.src.core.config import Settings
-from backend.src.models.schemas import UploadResponse
-from backend.src.services.ingestion import process_file
-from backend.src.services.vectorstore import VectorStoreService
 
 router = APIRouter()
 
@@ -75,7 +74,7 @@ async def upload_file(
     chunks = await process_file(file)
 
     # Store chunks in vector store
-    chunk_count = vectorstore.add_chunks(chunks)
+    chunk_count, collection_name = vectorstore.add_chunks(chunks, filename)
 
     return UploadResponse(
         status="indexed",

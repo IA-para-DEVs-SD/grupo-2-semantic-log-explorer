@@ -8,19 +8,19 @@ import os
 from unittest.mock import MagicMock
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-from httpx import ASGITransport, AsyncClient
-from hypothesis import HealthCheck, settings as hypothesis_settings
-
-from backend.src.api.dependencies import (
+from src.api.dependencies import (
     get_llm_service,
     get_settings_dep,
     get_vectorstore_service,
 )
-from backend.src.api.routes.chat import router as chat_router
-from backend.src.api.routes.upload import router as upload_router
-from backend.src.core.config import Settings
+from src.api.routes.chat import router as chat_router
+from src.api.routes.upload import router as upload_router
+from src.core.config import Settings
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
+from hypothesis import HealthCheck
+from hypothesis import settings as hypothesis_settings
 
 # ---------------------------------------------------------------------------
 # Hypothesis profiles
@@ -58,15 +58,16 @@ def mock_settings() -> Settings:
 def mock_vectorstore() -> MagicMock:
     """Return a mock ``VectorStoreService``."""
     mock = MagicMock()
-    mock.add_chunks.return_value = 3
-    mock._collection = MagicMock()
-    mock._collection.count.return_value = 5
+    mock.add_chunks.return_value = (3, "test_collection")
+    mock_collection = MagicMock()
+    mock_collection.count.return_value = 5
+    mock.get_collection_for_query.return_value = mock_collection
     return mock
 
 
 @pytest.fixture
 def mock_llm_service() -> MagicMock:
-    """Return a mock ``LLMService`` with an async streaming helper."""
+    """Return a mock ``LLMService`` with an async generate helper."""
     mock = MagicMock()
 
     async def mock_stream(*args, **kwargs):

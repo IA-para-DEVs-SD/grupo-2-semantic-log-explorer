@@ -44,3 +44,13 @@ Publique a branch seguindo o steering git.md
 9. 
 
 Crie uma feature apartir da develop e comite os arquivos e de o push e depois um pull request para develop
+
+10.
+
+Agora, crie uma apresentação web deste aplicativo para que eu possa apresentá-lo à minha turma e ao professor.
+
+A apresentação deve estar em um arquivo HTML e possuir slides, como no Google Apresentações.
+
+Gostaria que você adicionasse alguns insights do Git, como o histórico de commits, branches e os usuários que interagiram com o repositório. Use o gh (GitHub CLI) para obter essas informações.
+
+Sinta-se à vontade para adicionar informações importantes e interessantes que possam agregar valor à minha apresentação para o professor.

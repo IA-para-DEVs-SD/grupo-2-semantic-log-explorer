@@ -1,8 +1,7 @@
 """Unit tests for core/security.py — PII sanitization."""
 
-import pytest
 
-from backend.src.core.security import sanitize_pii
+from src.core.security import sanitize_pii
 
 
 class TestSanitizeCPF:

@@ -13,9 +13,8 @@ alphanumeric strings, prefixes like sk-, AIza, etc.).
 import re
 from pathlib import Path
 
-from hypothesis import given, settings, assume
+from hypothesis import given, settings
 from hypothesis import strategies as st
-
 
 # ---------------------------------------------------------------------------
 # Project paths

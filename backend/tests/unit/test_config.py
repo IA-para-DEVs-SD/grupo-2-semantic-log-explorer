@@ -1,9 +1,8 @@
 """Unit tests for core/config.py — Settings class."""
 
 import pytest
+from src.core.config import Settings
 from pydantic import ValidationError
-
-from backend.src.core.config import Settings
 
 
 class TestSettings:
@@ -44,7 +43,7 @@ class TestSettings:
         s = Settings(_env_file=None)
         assert s.CHROMA_COLLECTION_NAME == "log_chunks"
         assert s.MAX_FILE_SIZE_MB == 50
-        assert s.ALLOWED_EXTENSIONS == {".log", ".txt", ".json"}
+        assert {".log", ".txt", ".json"} == s.ALLOWED_EXTENSIONS
 
     def test_overrides_defaults_from_env(self, monkeypatch):
         """Settings must allow overriding defaults via environment variables."""
