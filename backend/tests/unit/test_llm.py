@@ -1,15 +1,14 @@
 """Unit tests for services/llm.py — LLM integration and prompt assembly."""
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-from backend.src.services.llm import (
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
+from src.services.llm import (
     SYSTEM_PROMPT,
-    build_prompt,
     LLMService,
+    build_prompt,
 )
 
 # ---------------------------------------------------------------------------

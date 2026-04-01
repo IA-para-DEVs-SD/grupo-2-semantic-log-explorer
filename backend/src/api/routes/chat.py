@@ -7,15 +7,14 @@ Recebe perguntas em linguagem natural, orquestra o pipeline RAG
 import logging
 from collections.abc import AsyncGenerator
 
+from src.api.dependencies import get_llm_service, get_vectorstore_service
+from src.core.security import sanitize_prompt_injection
+from src.models.schemas import ChatRequest
+from src.services.llm import LLMService
+from src.services.retriever import retrieve
+from src.services.vectorstore import VectorStoreService
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-
-from backend.src.api.dependencies import get_llm_service, get_vectorstore_service
-from backend.src.core.security import sanitize_prompt_injection
-from backend.src.models.schemas import ChatRequest
-from backend.src.services.llm import LLMService
-from backend.src.services.retriever import retrieve
-from backend.src.services.vectorstore import VectorStoreService
 
 logger = logging.getLogger(__name__)
 

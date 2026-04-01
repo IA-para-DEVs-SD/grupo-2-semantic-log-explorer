@@ -10,17 +10,15 @@ Validates: Requirements 1.5
 """
 
 import io
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from hypothesis import given, settings
-from hypothesis import strategies as st
+from src.api.routes.upload import router as upload_router
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from backend.src.api.routes.upload import router as upload_router
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -53,9 +51,8 @@ _chunk_count_strategy = st.integers(min_value=1, max_value=100)
 
 def create_test_app():
     """Create FastAPI app with mocked dependencies for testing."""
-    from backend.src.api.dependencies import (
+    from src.api.dependencies import (
         get_settings_dep,
-        get_vectorstore_service,
     )
 
     mock_settings = Settings(
@@ -98,7 +95,7 @@ def test_upload_response_contains_required_fields(
     - `chunks` must be an integer >= 1
     - `filename` must be a non-empty string equal to the uploaded filename
     """
-    from backend.src.api.dependencies import get_vectorstore_service
+    from src.api.dependencies import get_vectorstore_service
 
     app = create_test_app()
 

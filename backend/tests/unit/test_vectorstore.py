@@ -4,11 +4,10 @@ import uuid as _uuid
 from unittest.mock import MagicMock, patch
 
 import pytest
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
+from src.services.vectorstore import VectorStoreService
 from fastapi import HTTPException
-
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-from backend.src.services.vectorstore import VectorStoreService
 
 # ---------------------------------------------------------------------------
 # Helpers

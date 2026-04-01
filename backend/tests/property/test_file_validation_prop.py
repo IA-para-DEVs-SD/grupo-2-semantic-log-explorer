@@ -10,18 +10,15 @@ Validates: Requirements 1.1, 1.2
 """
 
 import io
-import string
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from hypothesis import given, settings, assume
-from hypothesis import strategies as st
+from src.api.routes.upload import router as upload_router
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from backend.src.api.routes.upload import router as upload_router
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-
+from hypothesis import assume, given, settings
+from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -59,7 +56,7 @@ _file_content_strategy = st.binary(min_size=1, max_size=1024)
 
 def create_test_app():
     """Create FastAPI app with mocked dependencies for testing."""
-    from backend.src.api.dependencies import (
+    from src.api.dependencies import (
         get_settings_dep,
         get_vectorstore_service,
     )

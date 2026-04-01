@@ -1,22 +1,23 @@
 """Módulo de armazenamento vetorial com ChromaDB.
 
 Gerencia a interface com o ChromaDB em modo efêmero para armazenamento
-e busca de embeddings gerados pelo modelo text-embedding-004 do Google.
+e busca de embeddings gerados pelo modelo gemini-embedding-001 do Google.
 """
 
 import logging
 import uuid
 
 import chromadb
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from fastapi import HTTPException
 
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk
+from src.core.config import Settings
+from src.models.schemas import Chunk
 
 logger = logging.getLogger(__name__)
 
-EMBEDDING_MODEL = "models/text-embedding-004"
+EMBEDDING_MODEL = "gemini-embedding-001"
 EMBEDDING_DIMENSIONS = 768
 
 
@@ -24,7 +25,7 @@ class VectorStoreService:
     """Interface with ChromaDB for vector storage and similarity search."""
 
     def __init__(self, settings: Settings) -> None:
-        genai.configure(api_key=settings.GOOGLE_API_KEY)
+        self._genai_client = genai.Client(api_key=settings.GOOGLE_API_KEY)
         self._collection_name = settings.CHROMA_COLLECTION_NAME
         try:
             self._client = chromadb.Client()
@@ -43,13 +44,19 @@ class VectorStoreService:
     # ------------------------------------------------------------------
 
     def _generate_embeddings(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for a list of texts via text-embedding-004."""
+        """Generate embeddings for a list of texts via gemini-embedding-001."""
         try:
-            response = genai.embed_content(
-                model=EMBEDDING_MODEL,
-                content=texts,
-            )
-            return response["embedding"]
+            all_embeddings: list[list[float]] = []
+            batch_size = 100
+            for i in range(0, len(texts), batch_size):
+                batch = texts[i : i + batch_size]
+                result = self._genai_client.models.embed_content(
+                    model=EMBEDDING_MODEL,
+                    contents=batch,
+                    config=types.EmbedContentConfig(output_dimensionality=EMBEDDING_DIMENSIONS),
+                )
+                all_embeddings.extend(e.values for e in result.embeddings)
+            return all_embeddings
         except Exception as exc:
             logger.error("Embedding generation failed: %s", exc)
             raise HTTPException(
@@ -86,12 +93,14 @@ class VectorStoreService:
         ]
 
         try:
-            self._collection.add(
-                ids=ids,
-                embeddings=embeddings,
-                documents=texts,
-                metadatas=metadatas,
-            )
+            batch_size = 5000
+            for i in range(0, len(chunks), batch_size):
+                self._collection.add(
+                    ids=ids[i : i + batch_size],
+                    embeddings=embeddings[i : i + batch_size],
+                    documents=texts[i : i + batch_size],
+                    metadatas=metadatas[i : i + batch_size],
+                )
         except Exception as exc:
             logger.error("ChromaDB add failed: %s", exc)
             raise HTTPException(

@@ -6,8 +6,8 @@ de cosseno no ChromaDB via VectorStoreService.
 
 import logging
 
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-from backend.src.services.vectorstore import VectorStoreService
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
+from src.services.vectorstore import VectorStoreService
 
 logger = logging.getLogger(__name__)
 

@@ -4,17 +4,15 @@ import io
 import json
 
 import pytest
-from fastapi import UploadFile
-
-from backend.src.services.ingestion import (
+from src.models.schemas import Chunk, LogLevel
+from src.services.ingestion import (
     _clean_noise,
     _detect_log_level,
     _extract_timestamp,
     _is_stack_trace_start,
     process_file,
 )
-from backend.src.models.schemas import Chunk, LogLevel
-
+from fastapi import UploadFile
 
 # ---------------------------------------------------------------------------
 # Helpers

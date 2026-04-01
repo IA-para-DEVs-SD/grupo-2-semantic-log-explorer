@@ -2,14 +2,13 @@ import logging
 import time
 from collections import defaultdict
 
+from src.api.routes.chat import router as chat_router
+from src.api.routes.upload import router as upload_router
+from src.core.config import get_settings
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-
-from backend.src.api.routes.upload import router as upload_router
-from backend.src.api.routes.chat import router as chat_router
-from backend.src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 

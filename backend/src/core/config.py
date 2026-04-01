@@ -18,6 +18,20 @@ class Settings(BaseSettings):
         "env_file_encoding": "utf-8",
     }
 
+    @field_validator("ALLOWED_EXTENSIONS", mode="before")
+    @classmethod
+    def parse_allowed_extensions(cls, v):
+        if isinstance(v, str):
+            return {ext.strip() for ext in v.split(",") if ext.strip()}
+        return v
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
+
     @field_validator("GOOGLE_API_KEY")
     @classmethod
     def google_api_key_must_not_be_empty(cls, v: str) -> str:

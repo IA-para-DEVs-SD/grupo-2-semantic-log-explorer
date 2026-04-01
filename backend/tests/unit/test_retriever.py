@@ -4,11 +4,10 @@ import uuid as _uuid
 from unittest.mock import patch
 
 import pytest
-
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-from backend.src.services.retriever import retrieve
-from backend.src.services.vectorstore import VectorStoreService
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
+from src.services.retriever import retrieve
+from src.services.vectorstore import VectorStoreService
 
 # ---------------------------------------------------------------------------
 # Constants & Helpers

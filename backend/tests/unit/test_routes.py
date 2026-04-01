@@ -3,11 +3,9 @@
 import io
 from unittest.mock import MagicMock, patch
 
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
 from fastapi.testclient import TestClient
-
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-
 
 # ---------------------------------------------------------------------------
 # Upload Route Tests
@@ -31,7 +29,7 @@ class TestUploadRoute:
         self, test_app, mock_settings, mock_vectorstore, mock_llm_service
     ):
         """Rejects file > 50MB → HTTP 413."""
-        from backend.src.api.dependencies import (
+        from src.api.dependencies import (
             get_settings_dep,
         )
 
@@ -164,7 +162,7 @@ class TestChatRoute:
         self, test_app, mock_settings, mock_llm_service
     ):
         """Rejects chat when no logs indexed → HTTP 400."""
-        from backend.src.api.dependencies import (
+        from src.api.dependencies import (
             get_vectorstore_service,
         )
 

@@ -8,17 +8,15 @@ For any response from the POST /api/chat endpoint, the content-type must be
 Validates: Requirement 9.1
 """
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from hypothesis import given, settings
-from hypothesis import strategies as st
+from src.api.routes.chat import router as chat_router
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from backend.src.api.routes.chat import router as chat_router
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -62,10 +60,10 @@ _token_count_strategy = st.integers(min_value=1, max_value=10)
 
 def create_test_app(mock_vectorstore, mock_llm_service):
     """Create FastAPI app with mocked dependencies for testing."""
-    from backend.src.api.dependencies import (
+    from src.api.dependencies import (
+        get_llm_service,
         get_settings_dep,
         get_vectorstore_service,
-        get_llm_service,
     )
 
     mock_settings = Settings(

@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from enum import Enum
+
+from pydantic import BaseModel, Field
 
 
 class LogLevel(str, Enum):
@@ -14,7 +14,7 @@ class LogLevel(str, Enum):
 
 class ChunkMetadata(BaseModel):
     filename: str
-    timestamp: Optional[str] = None
+    timestamp: str | None = None
     log_level: LogLevel = LogLevel.UNKNOWN
 
 

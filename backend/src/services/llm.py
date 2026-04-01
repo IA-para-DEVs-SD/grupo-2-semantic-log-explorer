@@ -1,4 +1,4 @@
-"""Módulo de integração com Google Gemini 1.5 Pro.
+"""Módulo de integração com Google Gemini.
 
 Gerencia o prompt de sistema especializado (SRE Senior) e a geração
 de respostas via streaming assíncrono.
@@ -7,14 +7,15 @@ de respostas via streaming assíncrono.
 import logging
 from collections.abc import AsyncGenerator
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk
+from src.core.config import Settings
+from src.models.schemas import Chunk
 
 logger = logging.getLogger(__name__)
 
-GEMINI_MODEL = "gemini-1.5-pro"
+GEMINI_MODEL = "gemini-2.5-flash"
 
 SYSTEM_PROMPT = (
     "Você é um Engenheiro de SRE Senior especializado em análise de logs "
@@ -66,14 +67,10 @@ def build_prompt(question: str, context_chunks: list[Chunk]) -> str:
 
 
 class LLMService:
-    """Integration with Google Gemini 1.5 Pro for RAG response generation."""
+    """Integration with Google Gemini for RAG response generation."""
 
     def __init__(self, settings: Settings) -> None:
-        genai.configure(api_key=settings.GOOGLE_API_KEY)
-        self._model = genai.GenerativeModel(
-            model_name=GEMINI_MODEL,
-            system_instruction=SYSTEM_PROMPT,
-        )
+        self._client = genai.Client(api_key=settings.GOOGLE_API_KEY)
 
     async def generate_stream(
         self,
@@ -92,9 +89,12 @@ class LLMService:
         prompt = build_prompt(question, context_chunks)
 
         try:
-            response = self._model.generate_content(
-                prompt,
-                stream=True,
+            response = self._client.models.generate_content_stream(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                ),
             )
             for chunk in response:
                 if chunk.text:
