@@ -58,15 +58,16 @@ def mock_settings() -> Settings:
 def mock_vectorstore() -> MagicMock:
     """Return a mock ``VectorStoreService``."""
     mock = MagicMock()
-    mock.add_chunks.return_value = 3
-    mock._collection = MagicMock()
-    mock._collection.count.return_value = 5
+    mock.add_chunks.return_value = (3, "test_collection")
+    mock_collection = MagicMock()
+    mock_collection.count.return_value = 5
+    mock.get_collection_for_query.return_value = mock_collection
     return mock
 
 
 @pytest.fixture
 def mock_llm_service() -> MagicMock:
-    """Return a mock ``LLMService`` with an async streaming helper."""
+    """Return a mock ``LLMService`` with an async generate helper."""
     mock = MagicMock()
 
     async def mock_stream(*args, **kwargs):

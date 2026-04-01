@@ -62,7 +62,7 @@ class TestUploadRoute:
         assert response.status_code == 400
         assert "Arquivo vazio" in response.json()["detail"]
 
-    @patch("backend.src.api.routes.upload.process_file")
+    @patch("src.api.routes.upload.process_file")
     def test_accepts_valid_log_file(self, mock_process_file, client, mock_vectorstore):
         """Accepts valid .log file → HTTP 200 with UploadResponse."""
         mock_chunks = [
@@ -76,6 +76,7 @@ class TestUploadRoute:
             ),
         ]
         mock_process_file.return_value = mock_chunks
+        mock_vectorstore.add_chunks.return_value = (2, "app_log")
 
         file_content = b"2024-01-15 10:00:00 INFO App started\n2024-01-15 10:00:01 ERROR Connection failed"
         files = {"file": ("app.log", io.BytesIO(file_content), "text/plain")}
@@ -88,7 +89,7 @@ class TestUploadRoute:
         assert data["filename"] == "app.log"
         assert "chunks" in data
 
-    @patch("backend.src.api.routes.upload.process_file")
+    @patch("src.api.routes.upload.process_file")
     def test_accepts_valid_txt_file(self, mock_process_file, client):
         """Accepts valid .txt file → HTTP 200."""
         mock_process_file.return_value = [
@@ -106,7 +107,7 @@ class TestUploadRoute:
         assert response.status_code == 200
         assert response.json()["filename"] == "server.txt"
 
-    @patch("backend.src.api.routes.upload.process_file")
+    @patch("src.api.routes.upload.process_file")
     def test_accepts_valid_json_file(self, mock_process_file, client):
         """Accepts valid .json file → HTTP 200."""
         mock_process_file.return_value = [
@@ -168,8 +169,9 @@ class TestChatRoute:
 
         # Create vectorstore mock with empty collection
         empty_vectorstore = MagicMock()
-        empty_vectorstore._collection = MagicMock()
-        empty_vectorstore._collection.count.return_value = 0
+        mock_collection = MagicMock()
+        mock_collection.count.return_value = 0
+        empty_vectorstore.get_collection_for_query.return_value = mock_collection
 
         test_app.dependency_overrides[get_vectorstore_service] = lambda: (
             empty_vectorstore
@@ -181,9 +183,9 @@ class TestChatRoute:
         assert response.status_code == 400
         assert "Nenhum log indexado" in response.json()["detail"]
 
-    @patch("backend.src.api.routes.chat.retrieve")
-    def test_returns_streaming_response(self, mock_retrieve, client, mock_vectorstore):
-        """Returns StreamingResponse with text/event-stream content type."""
+    @patch("src.api.routes.chat.retrieve")
+    def test_returns_json_response(self, mock_retrieve, client, mock_vectorstore):
+        """Returns JSONResponse with application/json content type."""
         mock_retrieve.return_value = [
             Chunk(
                 text="2024-01-15 10:00:00 ERROR Connection failed",
@@ -194,11 +196,11 @@ class TestChatRoute:
         response = client.post("/api/chat", json={"question": "What errors occurred?"})
 
         assert response.status_code == 200
-        assert response.headers["content-type"] == "text/event-stream; charset=utf-8"
+        assert "application/json" in response.headers["content-type"]
 
-    @patch("backend.src.api.routes.chat.retrieve")
-    def test_sse_format_has_data_prefix(self, mock_retrieve, client, mock_vectorstore):
-        """SSE format has data: prefix."""
+    @patch("src.api.routes.chat.retrieve")
+    def test_json_response_has_response_field(self, mock_retrieve, client, mock_vectorstore):
+        """JSON response has 'response' field."""
         mock_retrieve.return_value = [
             Chunk(
                 text="2024-01-15 10:00:00 ERROR Connection failed",
@@ -208,9 +210,9 @@ class TestChatRoute:
 
         response = client.post("/api/chat", json={"question": "What errors occurred?"})
 
-        content = response.text
-        # SSE events should have "data:" prefix
-        assert "data:" in content
+        data = response.json()
+        assert "response" in data
+        assert isinstance(data["response"], str)
 
     def test_rejects_question_exceeding_max_length(self, client):
         """Rejects question exceeding max length (2000 chars) → HTTP 422."""
@@ -226,7 +228,7 @@ class TestChatRoute:
 
         assert response.status_code == 422
 
-    @patch("backend.src.api.routes.chat.retrieve")
+    @patch("src.api.routes.chat.retrieve")
     def test_accepts_valid_question(self, mock_retrieve, client, mock_vectorstore):
         """Accepts valid question and returns response."""
         mock_retrieve.return_value = [

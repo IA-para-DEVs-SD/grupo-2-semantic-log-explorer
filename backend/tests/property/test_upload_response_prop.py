@@ -99,9 +99,9 @@ def test_upload_response_contains_required_fields(
 
     app = create_test_app()
 
-    # Create mock vectorstore that returns the generated chunk count
+    # Create mock vectorstore that returns the generated chunk count as tuple
     mock_vectorstore = MagicMock()
-    mock_vectorstore.add_chunks.return_value = chunk_count
+    mock_vectorstore.add_chunks.return_value = (chunk_count, "test_collection")
     app.dependency_overrides[get_vectorstore_service] = lambda: mock_vectorstore
 
     client = TestClient(app)
@@ -118,7 +118,7 @@ def test_upload_response_contains_required_fields(
     ]
 
     # Mock process_file to return the generated chunks
-    with patch("backend.src.api.routes.upload.process_file") as mock_process_file:
+    with patch("src.api.routes.upload.process_file") as mock_process_file:
         mock_process_file.return_value = mock_chunks
 
         files = {

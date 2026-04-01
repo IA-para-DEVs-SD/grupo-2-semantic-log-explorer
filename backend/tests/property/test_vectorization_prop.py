@@ -10,7 +10,8 @@ metadados devem conter os campos filename, timestamp e log_level.
 """
 
 import uuid as _uuid
-from unittest.mock import patch
+import tempfile
+from unittest.mock import MagicMock, patch
 
 from src.core.config import Settings
 from src.models.schemas import Chunk, ChunkMetadata, LogLevel
@@ -83,15 +84,26 @@ def _fake_settings() -> Settings:
     return Settings(
         GOOGLE_API_KEY=FAKE_API_KEY,
         CHROMA_COLLECTION_NAME=f"test_{_uuid.uuid4().hex[:8]}",
+        CHROMA_PERSIST_DIR=tempfile.mkdtemp(),
     )
 
 
-def _fake_embed_content_response(*, model=None, content=None, **kwargs):
-    """Build a fake response matching google.generativeai.embed_content output."""
-    texts = content
+def _make_fake_embedding_obj(values: list[float]):
+    obj = MagicMock()
+    obj.values = values
+    return obj
+
+
+def _fake_embed_content_response(texts):
+    """Build a fake response matching genai.Client().models.embed_content output."""
     if isinstance(texts, str):
-        return {"embedding": [0.1] * EMBEDDING_DIM}
-    return {"embedding": [[0.1 + i * 0.001] * EMBEDDING_DIM for i in range(len(texts))]}
+        texts = [texts]
+    result = MagicMock()
+    result.embeddings = [
+        _make_fake_embedding_obj([0.1 + i * 0.001] * EMBEDDING_DIM)
+        for i in range(len(texts))
+    ]
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -114,13 +126,16 @@ def test_vectorization_produces_correct_embeddings_and_metadata(
     """
     assume(len(chunks) > 0)
 
-    with patch("backend.src.services.vectorstore.genai") as mock_genai:
-        mock_genai.embed_content.side_effect = _fake_embed_content_response
+    with patch("src.services.vectorstore.genai") as mock_genai:
+        mock_client = MagicMock()
+        mock_client.models.embed_content.side_effect = lambda **kwargs: _fake_embed_content_response(kwargs.get("contents", []))
+        mock_genai.Client.return_value = mock_client
         svc = VectorStoreService(_fake_settings())
-        svc.add_chunks(chunks)
+        count, collection_name = svc.add_chunks(chunks, "test.log")
 
     # Retrieve everything stored in the collection
-    stored = svc._collection.get(include=["embeddings", "metadatas"])
+    collection = svc._client.get_or_create_collection(name=collection_name)
+    stored = collection.get(include=["embeddings", "metadatas"])
 
     assert len(stored["ids"]) == len(chunks), (
         f"Expected {len(chunks)} stored documents, got {len(stored['ids'])}"

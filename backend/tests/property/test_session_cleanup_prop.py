@@ -1,15 +1,16 @@
-"""Property-based test for session cleanup — clearing collection removes all data.
+"""Property-based test for session cleanup — deleting a log removes all its data.
 
 Feature: semantic-log-explorer, Property 8: Limpeza de sessão remove todos os dados
 
 Para qualquer coleção no ChromaDB com dados armazenados, após a execução da
-limpeza de sessão, a coleção deve estar vazia (zero documentos).
+limpeza de sessão (delete_log), a coleção deve ser removida.
 
 **Validates: Requirement 8.3**
 """
 
 import uuid as _uuid
-from unittest.mock import patch
+import tempfile
+from unittest.mock import MagicMock, patch
 
 from src.core.config import Settings
 from src.models.schemas import Chunk, ChunkMetadata, LogLevel
@@ -82,15 +83,26 @@ def _fake_settings() -> Settings:
     return Settings(
         GOOGLE_API_KEY=FAKE_API_KEY,
         CHROMA_COLLECTION_NAME=f"test_{_uuid.uuid4().hex[:8]}",
+        CHROMA_PERSIST_DIR=tempfile.mkdtemp(),
     )
 
 
-def _fake_embed_content_response(*, model=None, content=None, **kwargs):
-    """Build a fake response matching google.generativeai.embed_content output."""
-    texts = content
+def _make_fake_embedding_obj(values: list[float]):
+    obj = MagicMock()
+    obj.values = values
+    return obj
+
+
+def _fake_embed_content_response(texts):
+    """Build a fake response matching genai.Client().models.embed_content output."""
     if isinstance(texts, str):
-        return {"embedding": [0.1] * EMBEDDING_DIM}
-    return {"embedding": [[0.1 + i * 0.001] * EMBEDDING_DIM for i in range(len(texts))]}
+        texts = [texts]
+    result = MagicMock()
+    result.embeddings = [
+        _make_fake_embedding_obj([0.1 + i * 0.001] * EMBEDDING_DIM)
+        for i in range(len(texts))
+    ]
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -104,28 +116,32 @@ def test_session_cleanup_removes_all_data(chunks: list[Chunk]) -> None:
     """Feature: semantic-log-explorer, Property 8: Limpeza de sessão remove todos os dados
 
     For any collection in ChromaDB with stored data, after executing session
-    cleanup, the collection must be empty (zero documents).
+    cleanup (delete_log), the collection must be removed.
 
     **Validates: Requirement 8.3**
     """
     assume(len(chunks) > 0)
 
-    with patch("backend.src.services.vectorstore.genai") as mock_genai:
-        mock_genai.embed_content.side_effect = _fake_embed_content_response
+    with patch("src.services.vectorstore.genai") as mock_genai:
+        mock_client = MagicMock()
+        mock_client.models.embed_content.side_effect = lambda **kwargs: _fake_embed_content_response(kwargs.get("contents", []))
+        mock_genai.Client.return_value = mock_client
         svc = VectorStoreService(_fake_settings())
-        svc.add_chunks(chunks)
+        count, collection_name = svc.add_chunks(chunks, "test.log")
 
     # Confirm data was actually stored before cleanup
-    stored = svc._collection.get()
+    collection = svc._client.get_or_create_collection(name=collection_name)
+    stored = collection.get()
     assert len(stored["ids"]) == len(chunks), (
         f"Expected {len(chunks)} stored documents before cleanup, got {len(stored['ids'])}"
     )
 
-    # Execute session cleanup
-    svc.clear_collection()
+    # Execute session cleanup via delete_log
+    svc.delete_log(collection_name)
 
-    # After cleanup the collection must be empty
-    after = svc._collection.get()
-    assert len(after["ids"]) == 0, (
-        f"Expected 0 documents after cleanup, got {len(after['ids'])}"
+    # After cleanup the collection must be gone
+    remaining = svc._client.list_collections()
+    remaining_names = [c.name for c in remaining]
+    assert collection_name not in remaining_names, (
+        f"Expected collection '{collection_name}' to be deleted, but it still exists"
     )

@@ -69,7 +69,7 @@ def create_test_app():
     )
 
     mock_vectorstore = MagicMock()
-    mock_vectorstore.add_chunks.return_value = 1
+    mock_vectorstore.add_chunks.return_value = (1, "test_collection")
 
     test_app = FastAPI()
     test_app.include_router(upload_router, prefix="/api")
@@ -103,7 +103,7 @@ def test_valid_extensions_are_accepted(
     filename = f"{filename_base}{valid_extension}"
 
     # Mock process_file to avoid actual processing
-    with patch("backend.src.api.routes.upload.process_file") as mock_process_file:
+    with patch("src.api.routes.upload.process_file") as mock_process_file:
         mock_process_file.return_value = [
             Chunk(
                 text="test log content",

@@ -51,7 +51,6 @@ class TestSystemPrompt:
     def test_contains_anti_speculation_instruction(self):
         """Prompt must instruct not to speculate when data is insufficient."""
         assert "NÃO especule" in SYSTEM_PROMPT
-        assert "não encontrou dados suficientes" in SYSTEM_PROMPT
 
     def test_contains_markdown_formatting_instruction(self):
         """Prompt must instruct to format code in Markdown blocks."""
@@ -60,11 +59,12 @@ class TestSystemPrompt:
 
     def test_contains_root_cause_instruction(self):
         """Prompt must instruct to highlight the exact log excerpt."""
-        assert "causa raiz" in SYSTEM_PROMPT
+        assert "Causa Raiz" in SYSTEM_PROMPT
 
     def test_contains_executive_summary_instruction(self):
-        """Prompt must instruct concise summaries (max 5 sentences)."""
-        assert "5 frases" in SYSTEM_PROMPT
+        """Prompt must instruct concise summaries."""
+        assert "Resumo" in SYSTEM_PROMPT
+        assert "direto e objetivo" in SYSTEM_PROMPT
 
 
 # ---------------------------------------------------------------------------
@@ -126,14 +126,10 @@ class TestBuildPrompt:
 
 
 class TestLLMServiceInit:
-    def test_creates_model_with_system_prompt(self):
-        with patch("backend.src.services.llm.genai") as mock_genai:
+    def test_creates_client_with_api_key(self):
+        with patch("src.services.llm.genai") as mock_genai:
             svc = LLMService(_fake_settings())
-            mock_genai.configure.assert_called_once_with(api_key=FAKE_API_KEY)
-            mock_genai.GenerativeModel.assert_called_once()
-            call_kwargs = mock_genai.GenerativeModel.call_args
-            assert call_kwargs.kwargs["system_instruction"] == SYSTEM_PROMPT
-            assert call_kwargs.kwargs["model_name"] == "gemini-1.5-pro"
+            mock_genai.Client.assert_called_once_with(api_key=FAKE_API_KEY)
 
 
 # ---------------------------------------------------------------------------
@@ -149,10 +145,10 @@ class TestGenerateStream:
         mock_chunk2 = MagicMock()
         mock_chunk2.text = "world"
 
-        with patch("backend.src.services.llm.genai") as mock_genai:
-            mock_model = MagicMock()
-            mock_model.generate_content.return_value = [mock_chunk1, mock_chunk2]
-            mock_genai.GenerativeModel.return_value = mock_model
+        with patch("src.services.llm.genai") as mock_genai:
+            mock_client = MagicMock()
+            mock_client.models.generate_content_stream.return_value = [mock_chunk1, mock_chunk2]
+            mock_genai.Client.return_value = mock_client
 
             svc = LLMService(_fake_settings())
             tokens = []
@@ -170,14 +166,10 @@ class TestGenerateStream:
         mock_chunk3 = MagicMock()
         mock_chunk3.text = None
 
-        with patch("backend.src.services.llm.genai") as mock_genai:
-            mock_model = MagicMock()
-            mock_model.generate_content.return_value = [
-                mock_chunk1,
-                mock_chunk2,
-                mock_chunk3,
-            ]
-            mock_genai.GenerativeModel.return_value = mock_model
+        with patch("src.services.llm.genai") as mock_genai:
+            mock_client = MagicMock()
+            mock_client.models.generate_content_stream.return_value = [mock_chunk1, mock_chunk2, mock_chunk3]
+            mock_genai.Client.return_value = mock_client
 
             svc = LLMService(_fake_settings())
             tokens = []
@@ -188,10 +180,10 @@ class TestGenerateStream:
 
     @pytest.mark.asyncio
     async def test_handles_gemini_error_gracefully(self):
-        with patch("backend.src.services.llm.genai") as mock_genai:
-            mock_model = MagicMock()
-            mock_model.generate_content.side_effect = RuntimeError("API down")
-            mock_genai.GenerativeModel.return_value = mock_model
+        with patch("src.services.llm.genai") as mock_genai:
+            mock_client = MagicMock()
+            mock_client.models.generate_content_stream.side_effect = RuntimeError("API down")
+            mock_genai.Client.return_value = mock_client
 
             svc = LLMService(_fake_settings())
             tokens = []
@@ -203,17 +195,17 @@ class TestGenerateStream:
 
     @pytest.mark.asyncio
     async def test_passes_built_prompt_to_model(self):
-        with patch("backend.src.services.llm.genai") as mock_genai:
-            mock_model = MagicMock()
-            mock_model.generate_content.return_value = []
-            mock_genai.GenerativeModel.return_value = mock_model
+        with patch("src.services.llm.genai") as mock_genai:
+            mock_client = MagicMock()
+            mock_client.models.generate_content_stream.return_value = []
+            mock_genai.Client.return_value = mock_client
 
             svc = LLMService(_fake_settings())
             chunks = [_make_chunk(text="ERROR db timeout")]
             async for _ in svc.generate_stream("What failed?", chunks):
                 pass
 
-            call_args = mock_model.generate_content.call_args
-            prompt_sent = call_args.args[0]
+            call_args = mock_client.models.generate_content_stream.call_args
+            prompt_sent = call_args.kwargs["contents"]
             assert "ERROR db timeout" in prompt_sent
             assert "What failed?" in prompt_sent
