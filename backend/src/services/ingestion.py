@@ -6,12 +6,10 @@ sanitização de PII e chunking semântico preservando stack traces completos.
 
 import json
 import re
-from typing import Optional
 
+from src.core.security import sanitize_pii
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
 from fastapi import UploadFile
-
-from backend.src.core.security import sanitize_pii
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
 
 # Padrão para linhas de log com timestamp e nível
 _LOG_LINE_PATTERN = re.compile(
@@ -59,7 +57,7 @@ def _detect_log_level(text: str) -> LogLevel:
     return LogLevel.UNKNOWN
 
 
-def _extract_timestamp(text: str) -> Optional[str]:
+def _extract_timestamp(text: str) -> str | None:
     """Extrai o primeiro timestamp encontrado no texto."""
     match = re.search(
         r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?",

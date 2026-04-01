@@ -1,4 +1,4 @@
-"""Módulo de integração com Google Gemini 1.5 Pro.
+"""Módulo de integração com Google Gemini.
 
 Gerencia o prompt de sistema especializado (SRE Senior) e a geração
 de respostas via streaming assíncrono.
@@ -7,32 +7,47 @@ de respostas via streaming assíncrono.
 import logging
 from collections.abc import AsyncGenerator
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk
+from src.core.config import Settings
+from src.models.schemas import Chunk
 
 logger = logging.getLogger(__name__)
 
-GEMINI_MODEL = "gemini-1.5-pro"
+GEMINI_MODEL = "gemini-2.5-flash"
 
 SYSTEM_PROMPT = (
     "Você é um Engenheiro de SRE Senior especializado em análise de logs "
     "de aplicações e infraestrutura. Sua função é ajudar desenvolvedores a "
     "diagnosticar falhas, identificar causas raiz e sugerir correções com "
     "base nos logs fornecidos como contexto.\n\n"
-    "Regras:\n"
-    "1. Baseie suas respostas EXCLUSIVAMENTE nos logs fornecidos como contexto.\n"
-    "2. Se não houver informações suficientes nos logs para responder, "
-    "informe explicitamente que não encontrou dados suficientes. "
-    "NÃO especule nem invente informações.\n"
-    "3. Formate códigos de erro, comandos e trechos de log em blocos de "
-    "código Markdown (```), facilitando a leitura.\n"
-    "4. Quando identificar a causa raiz, destaque o trecho exato do log "
-    "que evidencia o problema.\n"
-    "5. Utilize linguagem técnica porém acessível, explicando termos "
-    "complexos quando necessário.\n"
-    "6. Para resumos executivos, seja direto e objetivo em no máximo 5 frases."
+    "## Formatação (OBRIGATÓRIO)\n"
+    "Sempre responda usando Markdown bem estruturado:\n"
+    "- Use títulos ### (nível 3) para separar seções. NUNCA use # ou ##.\n"
+    "- Use **negrito** para destacar informações críticas.\n"
+    "- Use listas (- ou 1.) para enumerar erros, causas ou recomendações.\n"
+    "- Coloque nomes de classes, métodos e exceções em `código inline`.\n"
+    "- Coloque trechos de log SEMPRE dentro de blocos de código com "
+    "tripla crase (```). Nunca cole logs como texto corrido.\n"
+    "- Cada bloco de código DEVE ter abertura e fechamento com ```.\n"
+    "- Separe cada seção com uma linha em branco.\n"
+    "- NÃO misture texto corrido com trechos de log na mesma linha.\n\n"
+    "## Estrutura da Resposta\n"
+    "Organize respostas longas nas seguintes seções:\n"
+    "### Resumo\n"
+    "Breve descrição do que foi encontrado (2-3 frases).\n"
+    "### Erros Encontrados\n"
+    "Lista dos erros com trechos de log em blocos de código.\n"
+    "### Causa Raiz\n"
+    "Análise da causa com evidências dos logs.\n"
+    "### Recomendações\n"
+    "Ações sugeridas em lista numerada.\n\n"
+    "## Regras\n"
+    "1. Baseie suas respostas EXCLUSIVAMENTE nos logs fornecidos.\n"
+    "2. Se não houver informações suficientes, informe explicitamente.\n"
+    "3. NÃO especule nem invente informações.\n"
+    "4. Seja direto e objetivo."
 )
 
 
@@ -66,14 +81,10 @@ def build_prompt(question: str, context_chunks: list[Chunk]) -> str:
 
 
 class LLMService:
-    """Integration with Google Gemini 1.5 Pro for RAG response generation."""
+    """Integration with Google Gemini for RAG response generation."""
 
     def __init__(self, settings: Settings) -> None:
-        genai.configure(api_key=settings.GOOGLE_API_KEY)
-        self._model = genai.GenerativeModel(
-            model_name=GEMINI_MODEL,
-            system_instruction=SYSTEM_PROMPT,
-        )
+        self._client = genai.Client(api_key=settings.GOOGLE_API_KEY)
 
     async def generate_stream(
         self,
@@ -92,9 +103,12 @@ class LLMService:
         prompt = build_prompt(question, context_chunks)
 
         try:
-            response = self._model.generate_content(
-                prompt,
-                stream=True,
+            response = self._client.models.generate_content_stream(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                ),
             )
             for chunk in response:
                 if chunk.text:

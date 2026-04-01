@@ -10,11 +10,9 @@ markers ([CPF_MASCARADO], [EMAIL_MASCARADO], [SENHA_MASCARADA]).
 
 import re
 
-from hypothesis import given, settings, assume
+from src.core.security import sanitize_pii
+from hypothesis import given, settings
 from hypothesis import strategies as st
-
-from backend.src.core.security import sanitize_pii
-
 
 # ---------------------------------------------------------------------------
 # Strategies — generators for PII values

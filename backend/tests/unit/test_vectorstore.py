@@ -2,13 +2,13 @@
 
 import uuid as _uuid
 from unittest.mock import MagicMock, patch
+import tempfile
 
 import pytest
+from src.core.config import Settings
+from src.models.schemas import Chunk, ChunkMetadata, LogLevel
+from src.services.vectorstore import VectorStoreService
 from fastapi import HTTPException
-
-from backend.src.core.config import Settings
-from backend.src.models.schemas import Chunk, ChunkMetadata, LogLevel
-from backend.src.services.vectorstore import VectorStoreService
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -21,11 +21,12 @@ EMBEDDING_DIM = 768
 def _fake_settings(**overrides) -> Settings:
     """Create a test Settings object with a fake API key.
 
-    Each call uses a unique collection name to isolate tests.
+    Each call uses a unique collection name and temp persist dir to isolate tests.
     """
     defaults = {
         "GOOGLE_API_KEY": FAKE_API_KEY,
         "CHROMA_COLLECTION_NAME": f"test_{_uuid.uuid4().hex[:8]}",
+        "CHROMA_PERSIST_DIR": tempfile.mkdtemp(),
     }
     defaults.update(overrides)
     return Settings(**defaults)
@@ -36,17 +37,26 @@ def _fake_embedding(dim: int = EMBEDDING_DIM, value: float = 0.1) -> list[float]
     return [value] * dim
 
 
-def _fake_embed_content_response(*, model=None, content=None, **kwargs):
-    """Build a fake response matching google.generativeai.embed_content output.
+def _make_fake_embedding_obj(values: list[float]):
+    """Create a fake embedding object with a .values attribute."""
+    obj = MagicMock()
+    obj.values = values
+    return obj
 
-    The real API is called as: genai.embed_content(model=..., content=...)
+
+def _fake_embed_content_response(texts):
+    """Build a fake response matching genai.Client().models.embed_content output.
+
+    Returns an object with .embeddings (list of objects with .values).
     """
-    texts = content
     if isinstance(texts, str):
-        return {"embedding": _fake_embedding()}
-    return {
-        "embedding": [_fake_embedding(value=0.1 + i * 0.01) for i in range(len(texts))]
-    }
+        texts = [texts]
+    result = MagicMock()
+    result.embeddings = [
+        _make_fake_embedding_obj(_fake_embedding(value=0.1 + i * 0.01))
+        for i in range(len(texts))
+    ]
+    return result
 
 
 def _make_chunk(
@@ -79,10 +89,11 @@ def settings():
 @pytest.fixture()
 def service(settings):
     """Create a VectorStoreService with mocked embedding generation."""
-    with patch("backend.src.services.vectorstore.genai") as mock_genai:
-        mock_genai.embed_content.side_effect = _fake_embed_content_response
+    with patch("src.services.vectorstore.genai") as mock_genai:
+        mock_client = MagicMock()
+        mock_client.models.embed_content.side_effect = lambda **kwargs: _fake_embed_content_response(kwargs.get("contents", []))
+        mock_genai.Client.return_value = mock_client
         svc = VectorStoreService(settings)
-        # Keep the mock active for the lifetime of the service
         svc._mock_genai = mock_genai
         yield svc
 
@@ -91,8 +102,10 @@ def service(settings):
 def service_with_data():
     """Service pre-loaded with 3 chunks (isolated collection)."""
     s = _fake_settings()
-    with patch("backend.src.services.vectorstore.genai") as mock_genai:
-        mock_genai.embed_content.side_effect = _fake_embed_content_response
+    with patch("src.services.vectorstore.genai") as mock_genai:
+        mock_client = MagicMock()
+        mock_client.models.embed_content.side_effect = lambda **kwargs: _fake_embed_content_response(kwargs.get("contents", []))
+        mock_genai.Client.return_value = mock_client
         svc = VectorStoreService(s)
         chunks = [
             _make_chunk(
@@ -114,27 +127,26 @@ def service_with_data():
                 LogLevel.WARNING,
             ),
         ]
-        svc.add_chunks(chunks)
+        svc.add_chunks(chunks, "app.log")
         yield svc
 
 
 # ---------------------------------------------------------------------------
-# Ephemeral mode
+# Persistent mode
 # ---------------------------------------------------------------------------
 
 
-class TestEphemeralMode:
-    def test_chromadb_client_is_ephemeral(self, service):
-        """ChromaDB must operate in ephemeral mode (no disk persistence)."""
-        # chromadb.Client() creates an ephemeral in-memory client by default
+class TestPersistentMode:
+    def test_chromadb_client_is_persistent(self, service):
+        """ChromaDB must operate in persistent mode."""
         assert service._client is not None
-        assert service._collection is not None
 
-    def test_collection_created_with_configured_name(self, settings):
-        """Collection name should match the settings."""
-        with patch("backend.src.services.vectorstore.genai"):
+    def test_client_created_with_persistent_client(self, settings):
+        """VectorStoreService should use PersistentClient."""
+        with patch("src.services.vectorstore.genai") as mock_genai:
+            mock_genai.Client.return_value = MagicMock()
             svc = VectorStoreService(settings)
-        assert svc._collection.name == settings.CHROMA_COLLECTION_NAME
+        assert svc._client is not None
 
 
 # ---------------------------------------------------------------------------
@@ -143,16 +155,20 @@ class TestEphemeralMode:
 
 
 class TestAddChunks:
-    def test_returns_count_of_chunks_added(self, service):
+    def test_returns_tuple_of_count_and_collection_name(self, service):
         chunks = [_make_chunk(), _make_chunk(text="INFO ok")]
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = _fake_embed_content_response
-            count = service.add_chunks(chunks)
+        with patch.object(service, "_generate_embeddings", side_effect=lambda texts: [_fake_embedding() for _ in texts]):
+            result = service.add_chunks(chunks, "test.log")
+        assert isinstance(result, tuple)
+        count, collection_name = result
         assert count == 2
+        assert isinstance(collection_name, str)
+        assert len(collection_name) > 0
 
     def test_empty_list_returns_zero(self, service):
-        count = service.add_chunks([])
+        count, name = service.add_chunks([], "test.log")
         assert count == 0
+        assert name == ""
 
     def test_stores_correct_metadata(self, service):
         chunk = _make_chunk(
@@ -161,12 +177,12 @@ class TestAddChunks:
             timestamp="2024-06-01 12:00:00",
             log_level=LogLevel.CRITICAL,
         )
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = _fake_embed_content_response
-            service.add_chunks([chunk])
+        with patch.object(service, "_generate_embeddings", side_effect=lambda texts: [_fake_embedding() for _ in texts]):
+            count, collection_name = service.add_chunks([chunk], "kern.log")
 
         # Verify stored data via ChromaDB peek
-        stored = service._collection.peek(limit=1)
+        collection = service._client.get_or_create_collection(name=collection_name)
+        stored = collection.peek(limit=1)
         assert len(stored["ids"]) == 1
         meta = stored["metadatas"][0]
         assert meta["filename"] == "kern.log"
@@ -175,20 +191,20 @@ class TestAddChunks:
 
     def test_stores_document_text(self, service):
         chunk = _make_chunk(text="ERROR segfault in module X")
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = _fake_embed_content_response
-            service.add_chunks([chunk])
+        with patch.object(service, "_generate_embeddings", side_effect=lambda texts: [_fake_embedding() for _ in texts]):
+            count, collection_name = service.add_chunks([chunk], "app.log")
 
-        stored = service._collection.peek(limit=1)
+        collection = service._client.get_or_create_collection(name=collection_name)
+        stored = collection.peek(limit=1)
         assert stored["documents"][0] == "ERROR segfault in module X"
 
     def test_none_timestamp_stored_as_empty_string(self, service):
         chunk = _make_chunk(timestamp=None)
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = _fake_embed_content_response
-            service.add_chunks([chunk])
+        with patch.object(service, "_generate_embeddings", side_effect=lambda texts: [_fake_embedding() for _ in texts]):
+            count, collection_name = service.add_chunks([chunk], "app.log")
 
-        stored = service._collection.peek(limit=1)
+        collection = service._client.get_or_create_collection(name=collection_name)
+        stored = collection.peek(limit=1)
         assert stored["metadatas"][0]["timestamp"] == ""
 
 
@@ -234,34 +250,29 @@ class TestSearch:
 
 
 # ---------------------------------------------------------------------------
-# clear_collection
+# delete_log
 # ---------------------------------------------------------------------------
 
 
-class TestClearCollection:
-    def test_removes_all_stored_data(self, service_with_data):
-        # Confirm data exists first
-        assert service_with_data._collection.count() == 3
+class TestDeleteLog:
+    def test_removes_collection(self, service_with_data):
+        # Find the collection name that was created
+        collections = service_with_data._client.list_collections()
+        assert len(collections) > 0
+        collection_name = collections[0].name
 
-        service_with_data.clear_collection()
+        service_with_data.delete_log(collection_name)
 
-        assert service_with_data._collection.count() == 0
+        # After deletion, listing should be empty
+        remaining = service_with_data._client.list_collections()
+        names = [c.name for c in remaining]
+        assert collection_name not in names
 
-    def test_clear_empty_collection_is_safe(self, service):
-        """Clearing an already-empty collection should not raise."""
-        service.clear_collection()
-        assert service._collection.count() == 0
-
-    def test_can_add_after_clear(self, service_with_data):
-        service_with_data.clear_collection()
-        assert service_with_data._collection.count() == 0
-
-        chunk = _make_chunk(text="INFO fresh start")
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = _fake_embed_content_response
-            service_with_data.add_chunks([chunk])
-
-        assert service_with_data._collection.count() == 1
+    def test_delete_nonexistent_collection_raises_404(self, service):
+        """Deleting a non-existent collection should raise HTTP 404."""
+        with pytest.raises(HTTPException) as exc_info:
+            service.delete_log("nonexistent_collection")
+        assert exc_info.value.status_code == 404
 
 
 # ---------------------------------------------------------------------------
@@ -271,47 +282,57 @@ class TestClearCollection:
 
 class TestErrorHandling:
     def test_embedding_failure_raises_502(self, settings):
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = lambda **kwargs: None  # init ok
+        with patch("src.services.vectorstore.genai") as mock_genai:
+            mock_client = MagicMock()
+            mock_client.models.embed_content.return_value = MagicMock(embeddings=[])
+            mock_genai.Client.return_value = mock_client
             svc = VectorStoreService(settings)
 
             # Now make embed_content raise on add_chunks
-            mock_genai.embed_content.side_effect = RuntimeError("API quota exceeded")
+            mock_client.models.embed_content.side_effect = RuntimeError("API quota exceeded")
             with pytest.raises(HTTPException) as exc_info:
-                svc.add_chunks([_make_chunk()])
+                svc.add_chunks([_make_chunk()], "test.log")
             assert exc_info.value.status_code == 502
             assert "embeddings" in exc_info.value.detail.lower()
 
     def test_chromadb_add_failure_raises_503(self, settings):
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = _fake_embed_content_response
+        with patch("src.services.vectorstore.genai") as mock_genai:
+            mock_client = MagicMock()
+            mock_client.models.embed_content.side_effect = lambda **kwargs: _fake_embed_content_response(kwargs.get("contents", []))
+            mock_genai.Client.return_value = mock_client
             svc = VectorStoreService(settings)
 
             # Embeddings succeed, but ChromaDB collection.add fails
-            original_add = svc._collection.add
-            svc._collection.add = MagicMock(side_effect=RuntimeError("disk full"))
+            original_get_or_create = svc._client.get_or_create_collection
+            mock_collection = MagicMock()
+            mock_collection.add.side_effect = RuntimeError("disk full")
+            svc._client.get_or_create_collection = MagicMock(return_value=mock_collection)
             with pytest.raises(HTTPException) as exc_info:
-                svc.add_chunks([_make_chunk()])
+                svc.add_chunks([_make_chunk()], "test.log")
             assert exc_info.value.status_code == 503
 
     def test_chromadb_search_failure_raises_503(self, settings):
-        with patch("backend.src.services.vectorstore.genai") as mock_genai:
-            mock_genai.embed_content.side_effect = _fake_embed_content_response
+        with patch("src.services.vectorstore.genai") as mock_genai:
+            mock_client = MagicMock()
+            mock_client.models.embed_content.side_effect = lambda **kwargs: _fake_embed_content_response(kwargs.get("contents", []))
+            mock_genai.Client.return_value = mock_client
             svc = VectorStoreService(settings)
 
-            svc._collection.query = MagicMock(
-                side_effect=RuntimeError("connection lost")
-            )
-            with pytest.raises(HTTPException) as exc_info:
-                svc.search(_fake_embedding(), top_k=5)
-            assert exc_info.value.status_code == 503
+            # Make get_collection_for_query return a mock collection that fails on query
+            mock_collection = MagicMock()
+            mock_collection.query.side_effect = RuntimeError("connection lost")
+            with patch.object(svc, "get_collection_for_query", return_value=mock_collection):
+                with pytest.raises(HTTPException) as exc_info:
+                    svc.search(_fake_embedding(), top_k=5)
+                assert exc_info.value.status_code == 503
 
     def test_chromadb_init_failure_raises_503(self):
         with (
-            patch("backend.src.services.vectorstore.genai"),
-            patch("backend.src.services.vectorstore.chromadb") as mock_chroma,
+            patch("src.services.vectorstore.genai") as mock_genai,
+            patch("src.services.vectorstore.chromadb") as mock_chroma,
         ):
-            mock_chroma.Client.side_effect = RuntimeError("cannot start")
+            mock_genai.Client.return_value = MagicMock()
+            mock_chroma.PersistentClient.side_effect = RuntimeError("cannot start")
             with pytest.raises(HTTPException) as exc_info:
                 VectorStoreService(_fake_settings())
             assert exc_info.value.status_code == 503

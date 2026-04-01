@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from enum import Enum
+
+from pydantic import BaseModel, Field
 
 
 class LogLevel(str, Enum):
@@ -14,7 +14,7 @@ class LogLevel(str, Enum):
 
 class ChunkMetadata(BaseModel):
     filename: str
-    timestamp: Optional[str] = None
+    timestamp: str | None = None
     log_level: LogLevel = LogLevel.UNKNOWN
 
 
@@ -31,6 +31,14 @@ class UploadResponse(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
+    collection: str | None = Field(None, description="Collection name to query")
+
+
+class LogInfo(BaseModel):
+    collection: str
+    filename: str
+    chunks: int
+    uploaded_at: str
 
 
 class ErrorResponse(BaseModel):

@@ -1,60 +1,42 @@
 <script setup>
 /**
  * MessageBubble component — renders chat messages with Markdown support.
- * Displays user and AI messages with distinct styling.
- * Supports Markdown rendering including formatted code blocks.
+ * During streaming: shows plain text with line breaks.
+ * After streaming: renders full markdown via markdown-it.
  */
 
 import { computed } from 'vue'
-import { marked } from 'marked'
+import MarkdownIt from 'markdown-it'
+
+const md = new MarkdownIt({
+  html: false,
+  breaks: true,
+  linkify: true,
+  typographer: false,
+})
 
 const props = defineProps({
-  /**
-   * Message content (plain text or Markdown).
-   */
   content: {
     type: String,
     required: true
   },
-  /**
-   * Message sender type.
-   */
   sender: {
     type: String,
     required: true,
     validator: (value) => ['user', 'ai'].includes(value)
   },
-  /**
-   * Timestamp of the message.
-   */
+  streaming: {
+    type: Boolean,
+    default: false
+  },
   timestamp: {
     type: [Date, String],
     default: null
   }
 })
 
-// Configure marked for secure rendering
-marked.setOptions({
-  breaks: true,
-  gfm: true
-})
-
-/**
- * Render Markdown content to HTML.
- * Only AI messages are rendered as Markdown.
- */
-const renderedContent = computed(() => {
-  if (props.sender === 'ai') {
-    return marked.parse(props.content)
-  }
-  // User messages: escape HTML and preserve line breaks
-  return escapeHtml(props.content).replace(/\n/g, '<br>')
-})
-
 /**
  * Escape HTML special characters to prevent XSS.
- * @param {string} text - Raw text
- * @returns {string} Escaped text
  */
 function escapeHtml(text) {
   const div = document.createElement('div')
@@ -63,8 +45,21 @@ function escapeHtml(text) {
 }
 
 /**
- * Format timestamp for display.
+ * Render content based on sender and streaming state.
+ * - User messages: always escaped plain text
+ * - AI streaming: escaped plain text with line breaks
+ * - AI done: full markdown render
  */
+const renderedContent = computed(() => {
+  if (props.sender === 'user') {
+    return escapeHtml(props.content).replace(/\n/g, '<br>')
+  }
+  if (props.streaming) {
+    return escapeHtml(props.content).replace(/\n/g, '<br>')
+  }
+  return md.render(props.content)
+})
+
 const formattedTime = computed(() => {
   if (!props.timestamp) return null
   const date = props.timestamp instanceof Date 
@@ -76,18 +71,12 @@ const formattedTime = computed(() => {
   })
 })
 
-/**
- * CSS classes for the bubble based on sender.
- */
 const bubbleClasses = computed(() => ({
   'message-bubble': true,
   'message-bubble--user': props.sender === 'user',
   'message-bubble--ai': props.sender === 'ai'
 }))
 
-/**
- * Accessible label for the message.
- */
 const ariaLabel = computed(() => {
   const senderLabel = props.sender === 'user' ? 'Você' : 'Assistente IA'
   return `Mensagem de ${senderLabel}`
@@ -159,8 +148,8 @@ const ariaLabel = computed(() => {
 .message-bubble {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  gap: 0.375rem;
+  padding: 0.875rem 1rem;
   border-radius: var(--radius);
   max-width: 85%;
 }
@@ -173,8 +162,11 @@ const ariaLabel = computed(() => {
 
 .message-bubble--ai {
   align-self: flex-start;
-  background-color: var(--muted);
+  background-color: var(--secondary);
   color: var(--foreground);
+  border: 1px solid var(--border);
+  width: 85%;
+  max-width: 85%;
 }
 
 .message-bubble__header {
@@ -189,7 +181,7 @@ const ariaLabel = computed(() => {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .message-bubble__icon {
@@ -197,18 +189,21 @@ const ariaLabel = computed(() => {
 }
 
 .message-bubble__time {
-  opacity: 0.7;
+  opacity: 0.6;
+  font-size: 0.6875rem;
 }
 
 .message-bubble__content {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   line-height: 1.6;
   word-break: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 /* AI message markdown styles */
 .message-bubble--ai .message-bubble__content :deep(p) {
-  margin: 0 0 0.75em 0;
+  margin: 0 0 0.625em 0;
 }
 
 .message-bubble--ai .message-bubble__content :deep(p:last-child) {
@@ -217,52 +212,77 @@ const ariaLabel = computed(() => {
 
 .message-bubble--ai .message-bubble__content :deep(ul),
 .message-bubble--ai .message-bubble__content :deep(ol) {
-  margin: 0 0 0.75em 0;
+  margin: 0 0 0.625em 0;
   padding-left: 1.25em;
 }
 
 .message-bubble--ai .message-bubble__content :deep(li) {
-  margin-bottom: 0.25em;
+  margin-bottom: 0.2em;
 }
 
 .message-bubble--ai .message-bubble__content :deep(code) {
   font-family: var(--font-mono);
-  font-size: 0.85em;
-  background-color: var(--background);
-  padding: 0.15em 0.35em;
-  border-radius: 4px;
+  font-size: 0.8125em;
+  background-color: #fff;
+  padding: 0.15em 0.4em;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  color: #be185d;
 }
 
 .message-bubble--ai .message-bubble__content :deep(pre) {
-  margin: 0.75em 0;
-  padding: 0.875rem 1rem;
-  background-color: var(--background);
-  border-radius: var(--radius);
+  margin: 0.625em 0;
+  padding: 0.75rem 1rem;
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-radius: 0.5rem;
   overflow-x: auto;
-  border: 1px solid var(--border);
+  border: none;
+  max-width: 100%;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .message-bubble--ai .message-bubble__content :deep(pre code) {
   background: none;
   padding: 0;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   line-height: 1.5;
+  border: none;
+  color: inherit;
+  white-space: pre;
 }
 
 .message-bubble--ai .message-bubble__content :deep(blockquote) {
-  margin: 0.75em 0;
+  margin: 0.625em 0;
   padding-left: 0.75rem;
-  border-left: 3px solid var(--border);
+  border-left: 3px solid var(--primary);
   color: var(--muted-foreground);
-  font-style: italic;
 }
 
 .message-bubble--ai .message-bubble__content :deep(h1),
 .message-bubble--ai .message-bubble__content :deep(h2),
 .message-bubble--ai .message-bubble__content :deep(h3),
 .message-bubble--ai .message-bubble__content :deep(h4) {
-  margin: 1em 0 0.5em 0;
+  margin: 0.875em 0 0.375em 0;
   font-weight: 600;
+}
+
+.message-bubble--ai .message-bubble__content :deep(h1) {
+  font-size: 1.05rem;
+}
+
+.message-bubble--ai .message-bubble__content :deep(h2) {
+  font-size: 1rem;
+}
+
+.message-bubble--ai .message-bubble__content :deep(h3) {
+  font-size: 0.9375rem;
+}
+
+.message-bubble--ai .message-bubble__content :deep(h4) {
+  font-size: 0.9375rem;
 }
 
 .message-bubble--ai .message-bubble__content :deep(h1:first-child),
@@ -281,8 +301,8 @@ const ariaLabel = computed(() => {
 .message-bubble--ai .message-bubble__content :deep(table) {
   width: 100%;
   border-collapse: collapse;
-  margin: 0.75em 0;
-  font-size: 0.875rem;
+  margin: 0.625em 0;
+  font-size: 0.8125rem;
 }
 
 .message-bubble--ai .message-bubble__content :deep(th),
@@ -293,29 +313,18 @@ const ariaLabel = computed(() => {
 }
 
 .message-bubble--ai .message-bubble__content :deep(th) {
-  background-color: var(--background);
+  background-color: #fff;
   font-weight: 600;
 }
 
 .message-bubble--ai .message-bubble__content :deep(hr) {
   border: none;
   border-top: 1px solid var(--border);
-  margin: 1em 0;
+  margin: 0.875em 0;
 }
 
 /* User message styles */
 .message-bubble--user .message-bubble__content {
   white-space: pre-wrap;
-}
-
-/* Dark theme adjustments for code blocks */
-@media (prefers-color-scheme: dark) {
-  .message-bubble--ai .message-bubble__content :deep(pre) {
-    background-color: hsl(222.2, 84%, 3%);
-  }
-  
-  .message-bubble--ai .message-bubble__content :deep(code) {
-    background-color: hsl(222.2, 84%, 3%);
-  }
 }
 </style>

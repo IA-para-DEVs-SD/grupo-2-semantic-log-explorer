@@ -12,13 +12,10 @@ across different chunks.
 import asyncio
 import io
 
-from hypothesis import given, settings, assume
-from hypothesis import strategies as st
-
+from src.services.ingestion import process_file
 from fastapi import UploadFile
-
-from backend.src.services.ingestion import process_file
-
+from hypothesis import assume, given, settings
+from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------
 # Strategies — generators for synthetic log content with stack traces

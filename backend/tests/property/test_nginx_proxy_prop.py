@@ -12,9 +12,8 @@ ensures that no /api route is ever treated as a static file.
 import re
 from pathlib import Path
 
-from hypothesis import given, settings, assume
+from hypothesis import given, settings
 from hypothesis import strategies as st
-
 
 # ---------------------------------------------------------------------------
 # Project paths
