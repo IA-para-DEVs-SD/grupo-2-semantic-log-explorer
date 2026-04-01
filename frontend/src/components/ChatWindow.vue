@@ -128,24 +128,27 @@ const handleSubmit = () => {
   height: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--card);
+  background: var(--background);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
 .chat-window__messages {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .chat-window__empty {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   color: var(--muted-foreground);
   font-size: 0.875rem;
 }
@@ -157,21 +160,21 @@ const handleSubmit = () => {
 .chat-window__loading {
   align-self: flex-start;
   padding: 0.75rem 1rem;
-  background: var(--muted);
+  background: var(--secondary);
   border-radius: var(--radius);
 }
 
 .loading-indicator {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.3rem;
   align-items: center;
 }
 
 .loading-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--muted-foreground);
+  background: #94a3b8;
   animation: bounce 1.4s infinite ease-in-out both;
 }
 
@@ -187,10 +190,10 @@ const handleSubmit = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background: hsl(0, 84.2%, 60.2%, 0.1);
-  border-top: 1px solid var(--destructive);
-  color: var(--destructive);
+  padding: 0.625rem 1rem;
+  background: #fef2f2;
+  border-top: 1px solid #fecaca;
+  color: #dc2626;
   font-size: 0.8125rem;
 }
 
@@ -201,7 +204,7 @@ const handleSubmit = () => {
   cursor: pointer;
   padding: 0.25rem;
   font-size: 0.875rem;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .chat-window__error-close:hover {
@@ -211,7 +214,7 @@ const handleSubmit = () => {
 .chat-window__input-form {
   display: flex;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1rem;
   border-top: 1px solid var(--border);
   background: var(--background);
 }
@@ -222,10 +225,12 @@ const handleSubmit = () => {
 
 .chat-window__send-btn {
   flex-shrink: 0;
-  width: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radius);
 }
 </style>

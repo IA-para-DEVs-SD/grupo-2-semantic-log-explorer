@@ -159,8 +159,8 @@ const ariaLabel = computed(() => {
 .message-bubble {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  gap: 0.375rem;
+  padding: 0.875rem 1rem;
   border-radius: var(--radius);
   max-width: 85%;
 }
@@ -173,8 +173,9 @@ const ariaLabel = computed(() => {
 
 .message-bubble--ai {
   align-self: flex-start;
-  background-color: var(--muted);
+  background-color: var(--secondary);
   color: var(--foreground);
+  border: 1px solid var(--border);
 }
 
 .message-bubble__header {
@@ -189,7 +190,7 @@ const ariaLabel = computed(() => {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .message-bubble__icon {
@@ -197,7 +198,8 @@ const ariaLabel = computed(() => {
 }
 
 .message-bubble__time {
-  opacity: 0.7;
+  opacity: 0.6;
+  font-size: 0.6875rem;
 }
 
 .message-bubble__content {
@@ -208,7 +210,7 @@ const ariaLabel = computed(() => {
 
 /* AI message markdown styles */
 .message-bubble--ai .message-bubble__content :deep(p) {
-  margin: 0 0 0.75em 0;
+  margin: 0 0 0.625em 0;
 }
 
 .message-bubble--ai .message-bubble__content :deep(p:last-child) {
@@ -217,29 +219,32 @@ const ariaLabel = computed(() => {
 
 .message-bubble--ai .message-bubble__content :deep(ul),
 .message-bubble--ai .message-bubble__content :deep(ol) {
-  margin: 0 0 0.75em 0;
+  margin: 0 0 0.625em 0;
   padding-left: 1.25em;
 }
 
 .message-bubble--ai .message-bubble__content :deep(li) {
-  margin-bottom: 0.25em;
+  margin-bottom: 0.2em;
 }
 
 .message-bubble--ai .message-bubble__content :deep(code) {
   font-family: var(--font-mono);
-  font-size: 0.85em;
-  background-color: var(--background);
-  padding: 0.15em 0.35em;
-  border-radius: 4px;
+  font-size: 0.8125em;
+  background-color: #fff;
+  padding: 0.15em 0.4em;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  color: #be185d;
 }
 
 .message-bubble--ai .message-bubble__content :deep(pre) {
-  margin: 0.75em 0;
+  margin: 0.625em 0;
   padding: 0.875rem 1rem;
-  background-color: var(--background);
+  background-color: #1e293b;
+  color: #e2e8f0;
   border-radius: var(--radius);
   overflow-x: auto;
-  border: 1px solid var(--border);
+  border: none;
 }
 
 .message-bubble--ai .message-bubble__content :deep(pre code) {
@@ -247,21 +252,22 @@ const ariaLabel = computed(() => {
   padding: 0;
   font-size: 0.8125rem;
   line-height: 1.5;
+  border: none;
+  color: inherit;
 }
 
 .message-bubble--ai .message-bubble__content :deep(blockquote) {
-  margin: 0.75em 0;
+  margin: 0.625em 0;
   padding-left: 0.75rem;
-  border-left: 3px solid var(--border);
+  border-left: 3px solid var(--primary);
   color: var(--muted-foreground);
-  font-style: italic;
 }
 
 .message-bubble--ai .message-bubble__content :deep(h1),
 .message-bubble--ai .message-bubble__content :deep(h2),
 .message-bubble--ai .message-bubble__content :deep(h3),
 .message-bubble--ai .message-bubble__content :deep(h4) {
-  margin: 1em 0 0.5em 0;
+  margin: 0.875em 0 0.375em 0;
   font-weight: 600;
 }
 
@@ -281,8 +287,8 @@ const ariaLabel = computed(() => {
 .message-bubble--ai .message-bubble__content :deep(table) {
   width: 100%;
   border-collapse: collapse;
-  margin: 0.75em 0;
-  font-size: 0.875rem;
+  margin: 0.625em 0;
+  font-size: 0.8125rem;
 }
 
 .message-bubble--ai .message-bubble__content :deep(th),
@@ -293,29 +299,18 @@ const ariaLabel = computed(() => {
 }
 
 .message-bubble--ai .message-bubble__content :deep(th) {
-  background-color: var(--background);
+  background-color: #fff;
   font-weight: 600;
 }
 
 .message-bubble--ai .message-bubble__content :deep(hr) {
   border: none;
   border-top: 1px solid var(--border);
-  margin: 1em 0;
+  margin: 0.875em 0;
 }
 
 /* User message styles */
 .message-bubble--user .message-bubble__content {
   white-space: pre-wrap;
-}
-
-/* Dark theme adjustments for code blocks */
-@media (prefers-color-scheme: dark) {
-  .message-bubble--ai .message-bubble__content :deep(pre) {
-    background-color: hsl(222.2, 84%, 3%);
-  }
-  
-  .message-bubble--ai .message-bubble__content :deep(code) {
-    background-color: hsl(222.2, 84%, 3%);
-  }
 }
 </style>

@@ -8,21 +8,12 @@ import { ref } from 'vue'
 import FileUpload from './components/FileUpload.vue'
 import ChatWindow from './components/ChatWindow.vue'
 
-// State for uploaded file info
 const uploadedFile = ref(null)
 
-/**
- * Handle successful file upload.
- * @param {Object} fileInfo - Object with filename and chunks count
- */
 const handleUploadSuccess = (fileInfo) => {
   uploadedFile.value = fileInfo
 }
 
-/**
- * Handle upload error.
- * @param {string} error - Error message
- */
 const handleUploadError = (error) => {
   console.error('Upload error:', error)
 }
@@ -31,26 +22,37 @@ const handleUploadError = (error) => {
 <template>
   <div class="app-container">
     <header class="app-header">
-      <h1 class="app-title">Semantic Log Explorer</h1>
-      <p class="app-subtitle">Análise inteligente de logs com IA</p>
+      <div class="app-header__inner">
+        <div class="app-header__brand">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="app-header__logo">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+          <div>
+            <h1 class="app-title">Semantic Log Explorer</h1>
+            <p class="app-subtitle">Análise inteligente de logs com IA</p>
+          </div>
+        </div>
+      </div>
     </header>
 
     <main class="app-main">
-      <section class="upload-section">
-        <FileUpload
-          @upload-success="handleUploadSuccess"
-          @upload-error="handleUploadError"
-        />
-      </section>
+      <div class="app-main__inner">
+        <section class="upload-section">
+          <FileUpload
+            @upload-success="handleUploadSuccess"
+            @upload-error="handleUploadError"
+          />
+        </section>
 
-      <section class="chat-section">
-        <ChatWindow />
-      </section>
+        <section class="chat-section">
+          <ChatWindow />
+        </section>
+      </div>
     </main>
-
-    <footer class="app-footer">
-      <p>Semantic Log Explorer — Observabilidade com IA Generativa</p>
-    </footer>
   </div>
 </template>
 
@@ -59,33 +61,63 @@ const handleUploadError = (error) => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #f8fafc;
 }
 
 .app-header {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid var(--border);
   background: var(--background);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-header__logo {
+  color: var(--primary);
+  flex-shrink: 0;
 }
 
 .app-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--foreground);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .app-subtitle {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--muted-foreground);
-  margin: 0.25rem 0 0 0;
+  margin: 0;
 }
 
 .app-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 2rem;
-  gap: 1.5rem;
+}
+
+.app-main__inner {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
 }
 
 .upload-section {
@@ -96,20 +128,6 @@ const handleUploadError = (error) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 400px;
-}
-
-
-
-.app-footer {
-  padding: 1rem 2rem;
-  border-top: 1px solid var(--border);
-  text-align: center;
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-}
-
-.app-footer p {
-  margin: 0;
+  min-height: 500px;
 }
 </style>
